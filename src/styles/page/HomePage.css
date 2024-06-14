@@ -1,0 +1,66 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+#navBar {
+    background-color: #4CAF50;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.login-container {
+    display: flex;
+    align-items: center;
+}
+
+#buttons {
+    display: flex;
+    gap: 10px;
+}
+
+button {
+    background-color: #ffffff;
+    border: 2px solid #4CAF50;
+    border-radius: 5px;
+    color: #4CAF50;
+    padding: 10px 20px;
+    margin: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+button:hover {
+    background-color: #4CAF50;
+    color: #ffffff;
+}
+
+#Login-button, #LanguageButton {
+    margin-right: 10px;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#about-warehouse {
+    margin: 20px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#contact {
+    margin: 20px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
