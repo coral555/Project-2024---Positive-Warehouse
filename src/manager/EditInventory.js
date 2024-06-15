@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useReducer, useCallback } from 'react';
 import './EditInventory.css';
 import { Link } from 'react-router-dom';
-import { db } from '../utility/firebase';
+import { db } from '../components/firebase_config';
 import { doc, updateDoc, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { getStorage, ref, getDownloadURL, uploadBytesResumable, deleteObject } from 'firebase/storage';
 import { fetchCategories, fetchSubcategories, fetchAllProducts } from '../databaseFetches';
-
 
 const initialState = {
     categories: [],
@@ -74,28 +73,26 @@ const EditInventory = () => {
         loadSubcategories();
     }, [state.selectedCategory]);
 
-
     useEffect(() => {
         const loadAllProducts = async () => {
             dispatch({ type: 'SET_LOADING', payload: true });
             try {
                 const productsData = await fetchAllProducts();
-                dispatch({ type: 'SET_PRODUCTS', payload: productsData });
-
                 const storage = getStorage();
-                const updatedProducts = [];
-
-                for (let i = 0; i < productsData.length; i++) {
-                    const product = productsData[i];
+                const updatedProducts = await Promise.all(productsData.map(async product => {
                     if (product.imageURL) {
                         const imageRef = ref(storage, product.imageURL);
-                        const url = await getDownloadURL(imageRef);
-                        updatedProducts.push({ ...product, imageURL: url });
+                        try {
+                            const url = await getDownloadURL(imageRef);
+                            return { ...product, imageURL: url };
+                        } catch (error) {
+                            console.log(`Image not found for product ${product.name}. Displaying without picture.`);
+                            return { ...product, imageURL: null };
+                        }
                     } else {
-                        updatedProducts.push({ ...product, imageURL: null });
+                        return { ...product, imageURL: null };
                     }
-                }
-
+                }));
                 dispatch({ type: 'SET_PRODUCTS', payload: updatedProducts });
             } finally {
                 dispatch({ type: 'SET_LOADING', payload: false });
@@ -103,6 +100,35 @@ const EditInventory = () => {
         };
         loadAllProducts();
     }, []);
+
+    // useEffect(() => {
+    //     const loadAllProducts = async () => {
+    //         dispatch({ type: 'SET_LOADING', payload: true });
+    //         try {
+    //             const productsData = await fetchAllProducts();
+    //             dispatch({ type: 'SET_PRODUCTS', payload: productsData });
+
+    //             const storage = getStorage();
+    //             const updatedProducts = [];
+
+    //             for (let i = 0; i < productsData.length; i++) {
+    //                 const product = productsData[i];
+    //                 if (product.imageURL) {
+    //                     const imageRef = ref(storage, product.imageURL);
+    //                     const url = await getDownloadURL(imageRef);
+    //                     updatedProducts.push({ ...product, imageURL: url });
+    //                 } else {
+    //                     updatedProducts.push({ ...product, imageURL: null });
+    //                 }
+    //             }
+
+    //             dispatch({ type: 'SET_PRODUCTS', payload: updatedProducts });
+    //         } finally {
+    //             dispatch({ type: 'SET_LOADING', payload: false });
+    //         }
+    //     };
+    //     loadAllProducts();
+    // }, []);
 
 
     const debounce = (func, delay) => {
@@ -247,26 +273,59 @@ const EditInventory = () => {
             console.error('Error updating product image:', error);
         }
     };
-    
 
-    const handleDeleteProduct = async (product) => {
+    
+    const handleDeleteProduct = async (productFields) => {
+        if (!productFields) {
+            console.error('Invalid product:', productFields);
+            return;
+        }
+    
         try {
-            const productDocRef = doc(db, 'products', product.id);
+            // Construct a query to find the product based on category, subcategory, and name
+            const productQuery = query(
+                collection(db, 'products'),
+                where('category', '==', productFields.category),
+                where('subcategory', '==', productFields.subcategory),
+                where('name', '==', productFields.name)
+            );
+            const querySnapshot = await getDocs(productQuery);
+            // Check if the product exists
+            if (querySnapshot.empty) {
+                console.error('Product not found');
+                return;
+            }
+
+            // Assume there's only one matching document
+            const productDoc = querySnapshot.docs[0];
+            const productDocRef = doc(db, 'products', productDoc.id);
+
+            // Delete the document
             await deleteDoc(productDocRef);
-            dispatch({
-                type: 'SET_PRODUCTS',
-                payload: state.products.filter(p => p.id !== product.id),
-            });
+
+            // Reference to Firebase Storage
+            const storage = getStorage();
+            const imageRef = ref(storage, productFields.imageURL);
+
+            try{
+                // Delete the image from Firebase Storage
+                await deleteObject(imageRef);
+            }catch(error){
+                console.error('Error deleting image:', error);
+            }
+            // Remove the image URL from the state if it exists
             setImageURLs((prev) => {
                 const updated = { ...prev };
-                delete updated[product.id];
+                delete updated[productFields.id];
                 return updated;
             });
+    
             console.log('Product deleted successfully');
         } catch (error) {
             console.error('Error deleting product:', error);
         }
     };
+    
 
     return (
         <div className="edit-inventory-container">
@@ -303,8 +362,10 @@ const EditInventory = () => {
                 ) : (
                     filterProducts().map(product => (
                         <div key={product.id} className="product-item">
-                            {product.imageURL && (
+                            {product.imageURL ? (
                                 <img src={product.imageURL} alt={product.description} />
+                            ) : (
+                                <div className="no-image">No Image Available</div>
                             )}
                             <input
                                 type="text"
