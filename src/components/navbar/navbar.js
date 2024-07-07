@@ -1,112 +1,57 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { IoCartOutline } from "react-icons/io5"; // Import IoCartOutline from react-icons/io5
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import React from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import { IoCartOutline, IoCallOutline, IoCardOutline, IoLogInOutline, IoHomeOutline } from "react-icons/io5";
 import "./navbar.css";
-import { useDispatch, useSelector } from "react-redux";
-import { clearCart } from "../../actions/cartActions";
-import { useCombined } from "../../context/CombinedContext";
+import { useSelector } from "react-redux";
 
 export const Navbar = () => {
-  const {
-  setSubCategory,
-  setCategory,
-  } = useCombined();
-  
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [tempDate, setTempDate] = useState(null); // Temporary date before confirmation
-  const [selectedDate, setSelectedDate] = useState(null); // Confirmed date
-  const navigate = useNavigate();
-  const calendarRef = useRef(null);
-  const dispatch = useDispatch();
-  const cartItems = useSelector((state) => state.cart); 
-  const [orderPlaced, setOrderPlaced] = useState(false); 
-  const handleResetCategory = () => {
-    setCategory(''); 
-    setSubCategory(''); 
-  };
-  const handleDateChange = (date) => {
-    setTempDate(date);
-  };
+  const cartItems = useSelector((state) => state.cart);
+  const orderPlaced = useSelector((state) => state.orderPlaced);
+  const location = useLocation();
 
-  const handleConfirmDate = () => {
-    if (tempDate) {
-      const startDate = new Date(tempDate.setHours(0, 0, 0, 0));
-      const endDate = new Date(startDate);
-      endDate.setDate(startDate.getDate() + 2);
-
-      setSelectedDate(startDate);
-      dispatch(clearCart());
-      const uniqueKey = Date.now();
-      navigate(`/CreateOrder?key=${uniqueKey}`, { state: { startDate, endDate } });
-      setShowCalendar(false);
-      setOrderPlaced(true);
-    }
-  };
-
-  const handleClickOutside = (event) => {
-    if (calendarRef.current && !calendarRef.current.contains(event.target)) {
-      setShowCalendar(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const handleCreateOrderClick = (e) => {
-    e.preventDefault();
-    setShowCalendar(!showCalendar);
-  };
-
-  const isPastDate = (date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return date < today;
-  };
-
-  const dayClassName = (date) => {
-    return isPastDate(date) ? "past-date" : "";
+  const isActive = (path) => {
+    return location.pathname === path ? "active-link" : "";
   };
 
   return (
-    
     <div className="navbar">
-      <div className="links">
-        <Link to="/"> Home </Link>
-        <Link to="/Donate"> Donate</Link>
-        <Link to="/AboutWarehouse"> AboutWarehouse</Link>
-        <div className="create-order-container">
-          <Link to="#" onClick={handleCreateOrderClick}>
-            Create Order
-          </Link>
-          {showCalendar && (
-            <div className="calendar-dropdown" ref={calendarRef}>
-              <DatePicker
-                selected={tempDate}
-                onChange={handleDateChange}
-                inline
-                filterDate={(date) => !isPastDate(date)}
-                dayClassName={dayClassName} 
-              />
-              <button onClick={() => { handleResetCategory(); handleConfirmDate(); }}>Confirm Date</button>
-            </div>
-          )}
-        </div>
-        <Link to="/loginPage"> login </Link>
-        <Link to="/ViewInventory" onClick={handleResetCategory}> View Inventory </Link>
-        <Link to="/contact"> Contact </Link>
-        <Link to="/cart" className="cart-link">
-          <IoCartOutline size={32} /> {/* Use IoCartOutline from react-icons/io5 */}
+      <div className="left-links">
+        <NavLink to="/loginPage" activeClassName="active-link">
+          <IoLogInOutline size={30}  style={isActive("/loginPage") ? { color: "#33e900" } : {}} />
+        </NavLink>
+      </div>
+      <div className="middle-left">
+        <NavLink to="/cart" className="cart-link" activeClassName="active-link">
+          <IoCartOutline size={30} style={isActive("/cart") ? { color: "#33e900" } : {}} />
           {Object.keys(cartItems).length > 0 && orderPlaced && (
             <span className="cart-notification" />
           )}
-        </Link>
+        </NavLink>
       </div>
+      <div className="links">
+        <NavLink to="/AboutWarehouse" activeClassName="active-link" className={isActive("/AboutWarehouse")}>
+          מי אנחנו
+        </NavLink>
+        <NavLink to="/ViewInventory" activeClassName="active-link" className={isActive("/ViewInventory")}>
+          הצגה
+        </NavLink>
+        <NavLink exact to="/" activeClassName="active-link" className={isActive("/")}>
+          <IoHomeOutline size={30} style={isActive("/") ? { color: "#33e900" } : {}} />
+        </NavLink>
+      </div>
+      <NavLink to="/contact" className={`support-icon ${isActive("/contact")}`} activeClassName="active-link">
+      <IoCallOutline size={38} style={isActive("/contact") ? { color: "#33e900" } : {}} />
+      </NavLink>
+      <a
+        href="https://payboxapp.page.link/ByZyKCSDAWy7Y4eL9"
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`pay-icon ${isActive("https://payboxapp.page.link/ByZyKCSDAWy7Y4eL9")}`}
+      >
+        <IoCardOutline size={38} />
+      </a>
     </div>
   );
 };
+
+export default Navbar;

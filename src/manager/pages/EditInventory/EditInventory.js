@@ -1,11 +1,22 @@
-import React, { useState, useReducer,useCallback } from 'react';
+import React, { useState, useReducer } from 'react';
 import './EditInventory.css';
 import { useCombined } from '../../../context/CombinedContext';
 import Modal from 'react-modal';
 import ProductItem from '../../components/ProductItem/ProductItem';
+
 import { initialState, reducer } from '../../reducers/manegerIndex';
-import {setSearchTerm, setSelectedCategory,setSelectedSubcategory,setEditedProducts,} from '../../actions/manegerActions';
-import {handleDescriptionChange,handleQuantityChange,handleImageChange,handleDeleteProduct,} from '../../../utils/manegerUdpates';
+import {
+    setSearchTerm,
+    setSelectedCategory,
+    setSelectedSubcategory,
+    setEditedProducts,
+} from '../../actions/manegerActions';
+import {
+    handleDescriptionChange,
+    handleQuantityChange,
+    handleImageChange,
+    handleDeleteProduct,
+} from '../../../utils/manegerUdpates';
 
 const EditInventory = () => {
     const [state, dispatch] = useReducer(reducer, initialState);
@@ -18,39 +29,16 @@ const EditInventory = () => {
         setCategory,
         setSubCategory,
         isFetchingAll,
-        fetchCategories,
-        fetchSubcategories,
-        fetchProducts,
     } = useCombined();
     const [imageURLs, setImageURLs] = useState({});
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [currentField, setCurrentField] = useState(null);
     const [currentProduct, setCurrentProduct] = useState(null);
     const [currentValue, setCurrentValue] = useState('');
-    const [deleteConfirmation, setDeleteConfirmation] = useState({isOpen: false,product: null,});
-
-   // Function to refresh all data
-   const refreshData = useCallback(async () => {
-    try {
-        // Reset component state to initial values
-        dispatch({ type: 'RESET_STATE', payload: initialState });
-
-        // Fetch categories, subcategories, and products
-        await fetchCategories();
-
-        // Fetch subcategories and products based on the selected category
-        if (state.selectedCategory) {
-            await fetchSubcategories(state.selectedCategory);
-            await fetchProducts(state.selectedCategory, state.selectedSubcategory);
-        } else {
-            await fetchProducts(); // Fetch all products if no category is selected
-        }
-        console.log('refreshed');
-    } catch (error) {
-        console.error('Error refreshing data:', error);
-    }
-}, [fetchCategories, fetchSubcategories, fetchProducts, state.selectedCategory, state.selectedSubcategory]);
-
+    const [deleteConfirmation, setDeleteConfirmation] = useState({
+        isOpen: false,
+        product: null,
+    });
 
     const handleCategoryChange = (event) => {
         dispatch(setSelectedCategory(event.target.value));
@@ -134,14 +122,11 @@ const EditInventory = () => {
     return (
         <div className="edit-inventory-container">
             <h2>ערוך מלאי</h2>
-            <div className="refresh-container">
-                <button className="refresh-button" onClick={refreshData}>רענן נתונים</button>
-            </div>
             <div className="search-container">
                 <select value={state.selectedCategory} onChange={handleCategoryChange}>
-                    <option value="">בחר קטגוריה</option>
+                    <option value="">בהכל</option>
                     {categories.map((category) => (
-                        <option key={category.id} value={category.name}>
+                        <option key={category} value={category.name}>
                             {category.name}
                         </option>
                     ))}
@@ -151,7 +136,7 @@ const EditInventory = () => {
                     onChange={handleSubcategoryChange}
                     disabled={!state.selectedCategory}
                 >
-                    <option value="">בחר תת-קטגוריה</option>
+                    <option value="">All Subcategories</option>
                     {subCategories.map((subCat, index) => (
                         <option key={index} value={subCat}>
                             {subCat}
@@ -160,7 +145,9 @@ const EditInventory = () => {
                 </select>
             </div>
             <div className="products-container">
-                {isFetchingMore ? (<p>טוען את הדף...</p>) : (
+                {isFetchingMore ? (
+                    <p>Loading...</p>
+                ) : (
                     products.map((product) => {
                         const editedProduct = state.editedProducts[product.id] || product;
                         return (
@@ -185,7 +172,7 @@ const EditInventory = () => {
                 className="small-modal"
                 overlayClassName="small-modal-overlay"
             >
-                <h2>{currentField === 'description' ? 'ערוך תיאור' : (currentField === 'quantity' ? 'ערוך כמות' : '')}</h2>
+                <h2>Edit {currentField}</h2>
                 {currentField && currentProduct && (
                     <input
                         type={currentField === 'quantity' ? 'number' : 'text'}
@@ -199,8 +186,8 @@ const EditInventory = () => {
                         }}
                     />
                 )}
-                <button onClick={handleSubmitEdit}>אשר</button>
-                <button onClick={closeModal}>ביטול</button>
+                <button onClick={handleSubmitEdit}>Submit</button>
+                <button onClick={closeModal}>Close</button>
             </Modal>
             <Modal
                 isOpen={deleteConfirmation.isOpen}
@@ -219,10 +206,10 @@ const EditInventory = () => {
             <div className="load-more">
                 {isFetchingAll ? (
                     <button className="load-more-button" onClick={fetchMoreProducts} disabled={isFetchingMore}>
-                        {isFetchingMore ? 'טוען את המוצרים...' : 'טען עוד מוצרים'}
+                        {isFetchingMore ? 'Loading...' : 'Load More'}
                     </button>
                 ) : (
-                    <footer className="no-products">אין עוד מוצרים</footer>
+                    <footer className="no-products">No products left</footer>
                 )}
             </div>
         </div>

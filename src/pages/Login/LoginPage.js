@@ -43,7 +43,6 @@ const LoginPage = ({ onLogin }) => {
   };
 
   return (
-    <div className="login">
     <div className="login-container-insidLogin">
       <Link to="/" className="back-to-home">
         <button className="back-button">Back to Home</button>
@@ -65,7 +64,6 @@ const LoginPage = ({ onLogin }) => {
       />
       <button onClick={handleLogin} className="login-button">Login</button>
       {error && <p className="error-message">{error}</p>}
-    </div>
     </div>
   );
 };
