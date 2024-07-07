@@ -115,3 +115,39 @@
   font-size: 24px; /* Increase font size for footer message */
   color: #999;
 }
+
+.create-order-container {
+  position: relative;
+  display: inline-block;
+  margin: 20px 0;
+}
+
+.calendar-dropdown {
+  position: absolute;
+  top: 60px;
+  right: 100;
+  background-color: rgb(147, 243, 151);
+  border: none; /* Remove the border */
+  border-radius: 20px;
+  box-shadow: 0 5px 15px rgba(1, 101, 8, 0.2);
+  padding: 15px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+} 
+
+.calendar-dropdown button {
+  margin-top: 1px;
+  padding: 15px 20px;
+  background-color: #026c04;
+  color: white;
+  border: none; /* Ensure no border */
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.calendar-dropdown button:hover {
+  background-color: #0a4503;
+}

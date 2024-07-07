@@ -40,8 +40,8 @@ export const NavbarManger = () => {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <Link to="/EditInventory">עריכת מלאי</Link>
-      <Link to="/AddNewProduct">הוספת מוצר חדש ועריכת קטגוריות</Link>
+      <Link to="/EditInventory">ערוך מלאי</Link>
+      <Link to="/AddNewProduct">הוספת מוצר חדש</Link>
       <Link to="/Reports">דוחות</Link>
       <Link to="/ManageOrders">ניהול הזמנות</Link> {/* New Link */}
     </div>

@@ -1,49 +1,19 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { db, storage } from '../../../utils/firebase';
-import { collection, doc, addDoc, updateDoc, deleteDoc, query, where, getDocs, writeBatch } from 'firebase/firestore';
+import { collection,doc, addDoc, updateDoc, deleteDoc, query, where, getDocs, writeBatch } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { useCombined } from '../../../context/CombinedContext';
 import './AddNewProduct.css';
-
+ 
 const AddNewProduct = () => {
-    const [categories, setCategories] = useState([]);
-    const [subCategories, setSubCategories] = useState([]);
+    const { categories, subCategories, fetchCategories, fetchSubcategories } = useCombined();
     const [newProduct, setNewProduct] = useState({ description: '', quantity: '', imageURL: '', name: '' });
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedSubcategory, setSelectedSubcategory] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
     const [newCategory, setNewCategory] = useState('');
-    const [newSubcategory, setNewSubcategory] = useState('');
+    const [newSubcategory, setNewSubcategory] = useState([]);
 
-    const fetchCategories = useCallback(async () => {
-        try {
-            const categoriesCollectionRef = collection(db, 'קטגוריות');
-            const categorySnapshot = await getDocs(categoriesCollectionRef);
-            const categoryList = categorySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setCategories(categoryList);
-        } catch (error) {
-            console.error('Error fetching categories:', error);
-        }
-    }, []);
-
-    const fetchSubcategories = useCallback(async (categoryName) => {
-        try {
-            const categoryDocRef = query(collection(db, 'קטגוריות'), where('name', '==', categoryName));
-            const categorySnapshot = await getDocs(categoryDocRef);
-
-            if (!categorySnapshot.empty) {
-                const categoryDoc = categorySnapshot.docs[0];
-                setSubCategories(categoryDoc.data().subcategory || []);
-            } else {
-                setSubCategories([]);
-            }
-        } catch (error) {
-            console.error('Error fetching subcategories:', error);
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchCategories();
-    }, [fetchCategories]);
 
     useEffect(() => {
         if (selectedCategory) {
@@ -68,7 +38,7 @@ const AddNewProduct = () => {
 
     const handleAddProduct = async () => {
         if (!newProduct.name || !newProduct.description || !newProduct.quantity || !selectedCategory || !selectedSubcategory || !selectedFile) {
-            alert('עליך למלא את כל השדות.');
+            alert('Please fill out all fields and select category/subcategory.');
             return;
         }
 
@@ -84,7 +54,7 @@ const AddNewProduct = () => {
                 name: newProduct.name,
                 description: newProduct.description,
                 quantity: parseInt(newProduct.quantity),
-                imageURL: imageURL,
+                imageURL: newImagePath,
             };
 
             const productsCollectionRef = collection(db, 'products');
@@ -94,7 +64,7 @@ const AddNewProduct = () => {
             setSelectedCategory('');
             setSelectedSubcategory('');
             setSelectedFile(null);
-
+            
             alert('המוצר נוסף בהצלחה');
             console.log('Product added successfully');
         } catch (error) {
@@ -104,7 +74,7 @@ const AddNewProduct = () => {
 
     const handleAddCategory = async () => {
         if (!newCategory) {
-            alert('בחר קטגוריה.');
+            alert('Please enter a category name.');
             return;
         }
 
@@ -116,10 +86,9 @@ const AddNewProduct = () => {
             if (querySnapshot.empty) {
                 await addDoc(categoriesCollectionRef, { name: newCategory, subcategory: [] });
                 setNewCategory('');
-                fetchCategories(); // Refresh categories list
-                alert('קטגוריה חדשה נוספה בהצלחה.');
+                alert('קטגוריה חדשה נוספה בהצלחה');
             } else {
-                alert('קטגוריה זו כבר קיימת.');
+                alert('Category already exists.');
             }
         } catch (error) {
             console.error('Error adding category:', error);
@@ -128,7 +97,7 @@ const AddNewProduct = () => {
 
     const handleAddSubcategory = async () => {
         if (!selectedCategory || !newSubcategory) {
-            alert('בחר קטגוריה ואוסף שם של תת-קטגוריה.');
+            alert('Please select a category and enter a subcategory name.');
             return;
         }
 
@@ -147,12 +116,12 @@ const AddNewProduct = () => {
                     await updateDoc(categoryRef, { subcategory: updatedSubcategories });
                     fetchSubcategories(selectedCategory);
                     setNewSubcategory('');
-                    alert('תת-קטגוריה חדשה נוספה בהצלחה.');
+                    alert('תת קטגוריה חדשה נוספה בהצלחה');
                 } else {
-                    alert('תת-קטגוריה זו כבר קיימת.');
+                    alert('Subcategory already exists.');
                 }
             } else {
-                alert('לא נמצאה הקטגוריה הזו.');
+                alert('Category not found.');
             }
         } catch (error) {
             console.error('Error adding subcategory:', error);
@@ -161,7 +130,7 @@ const AddNewProduct = () => {
 
     const handleRemoveCategory = async () => {
         if (!selectedCategory) {
-            alert('בחר קטגוריה למחיקה.');
+            alert('Please select a category to remove.');
             return;
         }
         try {
@@ -173,19 +142,17 @@ const AddNewProduct = () => {
                 batch.delete(doc.ref);
             });
             await batch.commit();
-
             const categoriesCollectionRef = collection(db, 'קטגוריות');
             const categoryQuery = query(categoriesCollectionRef, where('name', '==', selectedCategory));
             const categorySnapshot = await getDocs(categoryQuery);
-
+            
             if (!categorySnapshot.empty) {
                 const categoryDoc = categorySnapshot.docs[0];
                 await deleteDoc(doc(db, 'קטגוריות', categoryDoc.id));
                 setSelectedCategory('');
-                fetchCategories(); // Refresh categories list
-                alert('הקטגוריה והמוצרים השייכים לה נמחקו בהצלחה.');
+                alert('Category and its products removed successfully');
             } else {
-                alert('הקטגוריה לא נמצאה.');
+                alert('Category not found');
             }
         } catch (error) {
             console.error('Error removing category and its products:', error);
@@ -194,7 +161,7 @@ const AddNewProduct = () => {
 
     const handleRemoveSubcategory = async () => {
         if (!selectedCategory || !selectedSubcategory) {
-            alert('בחר קטגוריה ותת-קטגוריה למחיקה.');
+            alert('Please select a category and subcategory to remove.');
             return;
         }
         try {
@@ -206,11 +173,10 @@ const AddNewProduct = () => {
                 batch.delete(doc.ref);
             });
             await batch.commit();
-
             const categoriesCollectionRef = collection(db, 'קטגוריות');
             const categoryQuery = query(categoriesCollectionRef, where('name', '==', selectedCategory));
             const categorySnapshot = await getDocs(categoryQuery);
-
+            
             if (!categorySnapshot.empty) {
                 const categoryDoc = categorySnapshot.docs[0];
                 const categoryRef = doc(db, 'קטגוריות', categoryDoc.id);
@@ -220,9 +186,9 @@ const AddNewProduct = () => {
                 await updateDoc(categoryRef, { subcategory: updatedSubcategories });
                 fetchSubcategories(selectedCategory);
                 setSelectedSubcategory('');
-                alert('תת-הקטגוריה והמוצרים השייכים לה נמחקו בהצלחה.');
+                alert('Subcategory and its products removed successfully');
             } else {
-                alert('הקטגוריה לא נמצאה.');
+                alert('Category not found');
             }
         } catch (error) {
             console.error('Error removing subcategory and its products:', error);
@@ -230,9 +196,53 @@ const AddNewProduct = () => {
     };
 
     return (
-        <div className="add-product-category-container">
+        <div className="add-product-container">
+            <h3>הוספת מוצר</h3>
+            <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+                <option value="">בחר קטגוריה</option>
+                {categories.map((category) => (
+            <option key={category.id} value={category.name}>
+              {category.name}
+            </option>
+          ))}
+            </select>
+            <select value={selectedSubcategory} onChange={(e) => setSelectedSubcategory(e.target.value)}>
+                <option value="">בחר תת קטגוריה</option>
+                {subCategories.map((subCat, index) => (
+            <option key={index} value={subCat}>
+              {subCat}
+            </option>
+          ))}
+            </select>
+            <input
+                type="text"
+                name="description"
+                placeholder="תיאור המוצר"
+                value={newProduct.description}
+                onChange={handleInputChange}
+            />
+            <input
+                type="number"
+                name="quantity"
+                placeholder="כמות"
+                value={newProduct.quantity}
+                onChange={handleInputChange}
+            />
+            <input
+                type="text"
+                name="name"
+                placeholder="שם המוצר"
+                value={newProduct.name}
+                onChange={handleInputChange}
+            />
+            <input
+                type="file"
+                onChange={handleImageChange}
+            />
+            <button onClick={handleAddProduct}>הוספת מוצר</button>
+            
             <div className="category-management">
-                <h3>ניהול קטגוריות ותתי קטגוריות</h3>
+                <h3>ניהול קטגוריות ותת קטגוריות</h3>
                 <input
                     type="text"
                     placeholder="קטגוריה חדשה"
@@ -240,24 +250,14 @@ const AddNewProduct = () => {
                     onChange={(e) => setNewCategory(e.target.value)}
                 />
                 <button onClick={handleAddCategory}>הוספת קטגוריה</button>
-
+                <button onClick={handleRemoveCategory}>הסרת קטגוריה</button>
                 <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
                     <option value="">בחר קטגוריה להסרה</option>
                     {categories.map((category) => (
-                        <option key={category.id} value={category.name}>
-                            {category.name}
-                        </option>
-                    ))}
-                </select>
-                <button onClick={handleRemoveCategory}>הסרת קטגוריה</button>
-
-                <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-                    <option value="">בחר קטגוריה כדי להוסיף לה תת קטגוריה</option>
-                    {categories.map((category) => (
-                        <option key={category.id} value={category.name}>
-                            {category.name}
-                        </option>
-                    ))}
+            <option key={category.id} value={category.name}>
+              {category.name}
+            </option>
+          ))}
                 </select>
                 <input
                     type="text"
@@ -266,70 +266,15 @@ const AddNewProduct = () => {
                     onChange={(e) => setNewSubcategory(e.target.value)}
                 />
                 <button onClick={handleAddSubcategory}>הוספת תת קטגוריה</button>
-
-                <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-                    <option value="">בחר קטגוריה כדי להסיר ממנה תת קטגוריה</option>
-                    {categories.map((category) => (
-                        <option key={category.id} value={category.name}>
-                            {category.name}
-                        </option>
-                    ))}
-                </select>
+                <button onClick={handleRemoveSubcategory}>הסרת תת קטגוריה</button>
                 <select value={selectedSubcategory} onChange={(e) => setSelectedSubcategory(e.target.value)}>
                     <option value="">בחר תת קטגוריה להסרה</option>
                     {subCategories.map((subCat, index) => (
-                        <option key={index} value={subCat}>
-                            {subCat}
-                        </option>
-                    ))}
+            <option key={index} value={subCat}>
+              {subCat}
+            </option>
+          ))}
                 </select>
-                <button onClick={handleRemoveSubcategory}>הסרת תת קטגוריה</button>
-            </div>
-
-            <div className="add-product-container">
-                <h3>הוספת מוצר</h3>
-                <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-                    <option value="">בחר קטגוריה</option>
-                    {categories.map((category) => (
-                        <option key={category.id} value={category.name}>
-                            {category.name}
-                        </option>
-                    ))}
-                </select>
-                <select value={selectedSubcategory} onChange={(e) => setSelectedSubcategory(e.target.value)}>
-                    <option value="">בחר תת קטגוריה</option>
-                    {subCategories.map((subCat, index) => (
-                        <option key={index} value={subCat}>
-                            {subCat}
-                        </option>
-                    ))}
-                </select>
-                <input
-                    type="text"
-                    name="description"
-                    placeholder="תיאור המוצר"
-                    value={newProduct.description}
-                    onChange={handleInputChange}
-                />
-                <input
-                    type="number"
-                    name="quantity"
-                    placeholder="כמות"
-                    value={newProduct.quantity}
-                    onChange={handleInputChange}
-                />
-                <input
-                    type="text"
-                    name="name"
-                    placeholder="שם המוצר"
-                    value={newProduct.name}
-                    onChange={handleInputChange}
-                />
-                <input
-                    type="file"
-                    onChange={handleImageChange}
-                />
-                <button onClick={handleAddProduct}>הוספת מוצר</button>
             </div>
         </div>
     );
