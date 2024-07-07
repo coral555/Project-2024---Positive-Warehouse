@@ -1,0 +1,51 @@
+// src/manager/components/navbar/NavbarManger.js
+
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import "./navbar.css";
+import { useCombined } from "../../../context/CombinedContext";
+
+export const NavbarManger = () => {
+  const { fetchMoreProducts } = useCombined();
+  const [isOpen, setIsOpen] = useState(false);
+  const [timerId, setTimerId] = useState(null);
+
+  const handleMouseEnter = () => {
+    if (timerId) {
+      clearTimeout(timerId); // Cancel the timeout if mouse enters again before timeout
+    }
+    setIsOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    const id = setTimeout(() => {
+      setIsOpen(false);
+    }, 300); // Adjust the delay here (e.g., 300ms)
+
+    setTimerId(id);
+  };
+
+  // Clear the timer when component unmounts
+  useEffect(() => {
+    return () => {
+      if (timerId) {
+        clearTimeout(timerId);
+      }
+    };
+  }, [timerId]);
+
+  return (
+    <div
+      className={`vertical-nav-bar ${isOpen ? "open" : ""}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <Link to="/EditInventory">עריכת מלאי</Link>
+      <Link to="/AddNewProduct">הוספת מוצר חדש ועריכת קטגוריות</Link>
+      <Link to="/Reports">דוחות</Link>
+      <Link to="/ManageOrders">ניהול הזמנות</Link> {/* New Link */}
+    </div>
+  );
+};
+
+export default NavbarManger;

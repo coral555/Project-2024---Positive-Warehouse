@@ -1,0 +1,139 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+.navBar {
+    background-color: #4CAF50;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.contactPage{
+    direction: rtl;
+
+}
+.logo-link {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 150px;
+    height: 50px;
+}
+
+#buttons {
+    display: flex;
+    gap: 15px;
+    flex-grow: 1;
+}
+
+.manager-button {
+    background-color: #FF6F61; /* Example for different styling */
+}
+
+button {
+    background-color: #ffffff;
+    border: 2px solid #4CAF50;
+    border-radius: 5px;
+    color: #4CAF50;
+    padding: 10px 20px;
+    margin: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.contactBanner {
+    background: url('https://infoteknextjs.vercel.app/assets/img/breadcrumb.jpg') no-repeat center center;
+    background-size: cover;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-align: center;
+}
+
+.bannerContent {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.contactSection {
+    margin: 20px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: right;
+}
+
+.contactDetails {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.contactPerson {
+    display: flex;
+    align-items: center;
+    background-color: DarkSeaGreen;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: #fff;
+    width: 48%;
+}
+
+.contactPerson img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-right: 10px; /* Changed margin to right */
+}
+
+.contactPerson .contactInfo {
+    text-align: right;
+}
+
+.contactPerson h3, .contactPerson p {
+    margin: 0;
+}
+
+.contactPerson p {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.contactPerson p i {
+    margin-left: 5px;
+}
+
+.contactEmail {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.contactEmail h2 {
+    font-size: 24px;
+}
+
+.contactEmail p {
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.contactEmail p i {
+    margin-left: 10px;
+}

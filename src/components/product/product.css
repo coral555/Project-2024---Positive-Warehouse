@@ -1,0 +1,108 @@
+.product {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 16px;
+  max-width: 300px;
+  background-color: transparent;
+}
+
+.product:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.product img {
+  max-width: 100%;
+  height: auto;
+  max-height: 150px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.description {
+  margin-top: 12px;
+}
+
+.product-name {
+  font-size: 1.1em;
+  margin: 0;
+}
+
+.product-price {
+  color: #888;
+  margin: 4px 0 16px 0;
+}
+
+.addToCartBttn {
+  background-color: #000;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.addToCartBttn:hover {
+  background-color: #333;
+  transform: scale(1.05);
+}
+
+.addToCartBttn:active {
+  background-color: #000;
+  transform: scale(0.95);
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.modal-content h3 {
+  margin: 0 0 20px;
+}
+
+.modal-content input {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 80%;
+}
+
+.modal-content button {
+  background-color: #000;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0 10px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.modal-content button:hover {
+  background-color: #333;
+}
+
+.modal-content button:active {
+  background-color: #000;
+}
