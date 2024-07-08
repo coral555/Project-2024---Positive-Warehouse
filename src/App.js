@@ -20,6 +20,7 @@ import ProtectedRoute from './pages/Login/ProtectedRoute';
 import EditInventory from './manager/pages/EditInventory/EditInventory';
 import LoginPage from './pages/Login/LoginPage';
 import ManageOrders from './manager/pages/ManageOrders/ManageOrders';
+import Reports from './manager/pages/Reports/Reports';
 
 const store = createStore(rootReducer);
 
@@ -79,6 +80,19 @@ function App() {
                     <>
                       <NavbarManger />
                       <ProtectedRoute isAuthenticated={isAuthenticated} element={<ManageOrders />} />
+                    </>
+                  ) : (
+                    <Navigate to="/LoginPage" replace />
+                  )
+                }
+              />
+              <Route
+                path="/Reports"
+                element={
+                  isAuthenticated ? (
+                    <>
+                      <NavbarManger />
+                      <ProtectedRoute isAuthenticated={isAuthenticated} element={<Reports/>} />
                     </>
                   ) : (
                     <Navigate to="/LoginPage" replace />
