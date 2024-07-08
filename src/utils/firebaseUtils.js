@@ -172,3 +172,18 @@ export const placeOrder = async (order) => {
     console.error("Error adding document: ", e);
   }
 };
+
+export const fetchOldOrders = async () => {
+  const categoriesCollection = collection(db, "oldOrders");
+  const categorySnapshot = await getDocs(categoriesCollection);
+  const orderList = categorySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }))
+  // const categoryList = categorySnapshot.docs.map(doc => ({
+  //   id: doc.id,
+  //   name: doc.data().name,
+  //   subCategory: doc.data().subcategory || []
+  // }));
+  return orderList;
+};

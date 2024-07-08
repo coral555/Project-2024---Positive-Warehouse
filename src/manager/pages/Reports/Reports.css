@@ -43,7 +43,7 @@
 
 .submit-button {
     display: inline-block;
-    background-color: dodgerblue;
+    background-color: green;
     color: white;
     font-family: Arial, sans-serif;
     font-size: 16px;
@@ -55,11 +55,8 @@
 }
 
 .submit-button:hover {
-    background-color: #007acc;
-}
-
-.submit-button:active {
-    transform: translateY(2px);
+    background-color: lightgreen;
+    background-color: black;
 }
 
 .reports-reports {
@@ -73,9 +70,8 @@
 
 
 .report {
-    background-color: #007acc;
+    background-color: white;
     width: 100%;
-    height: 50%;
     border: 1px solid black;
-
+    padding: 5px;
 }

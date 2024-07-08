@@ -1,5 +1,7 @@
 import "./Reports.css";
 import React, { useState } from "react";
+ 
+import {fetchOldOrders} from "../../../utils/firebaseUtils";
 
 const Reports = () => {
 
@@ -17,21 +19,23 @@ const Reports = () => {
         setDateEnd(event.target.value);
     };
   
-    const handleSubmit = (event) => {
+
+    const filterByDate = (reports) => {
+
+        // Unimplimented yet
+
+        return reports
+    }
+
+    const handleSubmit = async (event) => {
 
         event.preventDefault();
 
-        alert(`Searching from ${date_start} to ${date_end}`);
+        const Oldorders = await fetchOldOrders();
 
-        const numOfReports = reports.length;
-
-        const newReports = [
-            ...reports,
-            { id: numOfReports, content: `report ${numOfReports}` },
-        ];
+        const newReports = filterByDate(Oldorders);
 
         setReports(newReports);
-        
     };
 
     return (
@@ -76,7 +80,20 @@ const Reports = () => {
                     
                     {reports.map((report) => (
                         <div key={report.id} className="report">
-                            {report.content}
+                            Name: {report.user.name}, Phone: {report.user.phone}, email: {report.user.email}
+                            <ul>
+                                <li>id: {report.id}</li>
+                                <li>End date: {report.endDate}</li>
+                                <li>Start date: {report.startDate}</li>
+                                <li>orderDate: {report.orderDate}</li>
+                            </ul>
+                            <ul>
+                                {report.products.map((product, index) => (
+                                    <li key={index}>
+                                        <strong>Product Name:</strong> {product.productName}, <strong>Quantity:</strong> {product.selectedQuantity}
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
                     ))}
 
