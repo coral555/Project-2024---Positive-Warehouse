@@ -19,17 +19,33 @@ const Reports = () => {
         setDateEnd(event.target.value);
     };
   
+    const doDatesOverlap = function(start_1, end_1, start_2, end_2) {
+        // Convert date strings to Date objects
+        const startDate = new Date(start_1);
+        const endDate = new Date(end_1);
+        const startDate2 = new Date(start_2);
+        const endDate2 = new Date(end_2);
 
-    const filterByDate = (reports) => {
+        console.log(startDate, startDate2, endDate2);
 
-        // Unimplimented yet
+        // Check if the first date range is within the second date range
+        if (startDate2 <= startDate && endDate <= endDate2) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    const filterByDate = function(reports) {
 
-        return reports
+        const results = reports.filter((report) => {
+            return doDatesOverlap(report.startDate,report.endDate,date_start,date_end);
+        });
+
+        return results
     }
 
     const handleSubmit = async (event) => {
-
-        event.preventDefault();
 
         const Oldorders = await fetchOldOrders();
 
