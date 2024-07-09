@@ -19,7 +19,7 @@
 .reports-input {
     background-color: lightgray;
     width: 100%;
-    height: 15%;
+    height: 25%;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -56,7 +56,6 @@
 
 .submit-button:hover {
     background-color: lightgreen;
-    background-color: black;
 }
 
 .reports-reports {
@@ -74,4 +73,26 @@
     width: 100%;
     border: 1px solid black;
     padding: 5px;
+}
+
+.column-input {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.text-input {
+    padding: 8px;
+    width: 140px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.text-input:focus {
+    border-color: #66afe9;
+    box-shadow: 0 0 8px rgba(102, 175, 233, 0.6);
+    outline: none;
 }
