@@ -7,7 +7,7 @@ export const handleDescriptionChange = async (productFields, value) => {
     if (value === '') {
         alert('הוסף תיאור');
         return;
-    }
+    } 
     try {
         const productQuery = query(
             collection(db, 'products'),
@@ -28,10 +28,7 @@ export const handleDescriptionChange = async (productFields, value) => {
 };
 
 export const handleQuantityChange = async (productFields, value) => {
-    // Convert value to number
     value = Number(value);
-
-    // Check if value is not a valid number or less than 0
     if (isNaN(value) || value < 0) {
         alert('הכמות לא חוקית');
         return;
@@ -57,7 +54,6 @@ export const handleQuantityChange = async (productFields, value) => {
 
 export const handleImageChange = async (productFields, file) => {
     if (!file) return;
-
     try {
         const productQuery = query(
             collection(db, 'products'),
@@ -81,7 +77,6 @@ export const handleImageChange = async (productFields, file) => {
                 console.error('Error deleting old image:', error);
             }
         }
-
         const newImagePath = `products/${file.name}`;
         const storageRef = ref(getStorage(), `products/${file.name}`);
         const uploadTask = uploadBytesResumable(storageRef, file);
@@ -114,7 +109,6 @@ export const handleDeleteProduct = async (productFields, setImageURLs) => {
         console.error('Invalid product:', productFields);
         return;
     }
-
     try {
         const productQuery = query(
             collection(db, 'products'),
@@ -136,7 +130,7 @@ export const handleDeleteProduct = async (productFields, setImageURLs) => {
         try {
             await deleteObject(imageRef);
         } catch (error) {
-            console.error('Error deleting image:', error);
+             console.error('Error deleting image:', error);
         }
         setImageURLs((prev) => {
             const updated = { ...prev };

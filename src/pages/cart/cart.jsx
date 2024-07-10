@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { CartItem } from "../../components/cart-item/cart-item";
 import { useNavigate, useLocation } from "react-router-dom";
-import { PlaceOrder } from "../../actions/cartActions";
-import { addDoc, collection } from "firebase/firestore";
+import { PlaceOrder, clearCart } from "../../actions/cartActions"; // Ensure clearCart action is imported
+import { addDoc, collection, Timestamp } from "firebase/firestore"; // Ensure Timestamp is imported
 import { db } from "../../utils/firebase";
 import Modal from "../../components/Modal/Modal";
 import { useCombined } from "../../context/CombinedContext";
@@ -12,12 +12,13 @@ import "./cart.css";
 export const Cart = () => {
   const {
     products,
-    isModalOpen,
+    isModalOpen, 
     setIsModalOpen,
     startDate,
     endDate,
+    handleResetDates,
   } = useCombined();
-  
+
   const cartItems = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -60,15 +61,16 @@ export const Cart = () => {
         };
       });
 
-    const currentDate = new Date(); 
-    const formattedDate = `${currentDate.getMonth() + 1}/${currentDate.getDate()}/${currentDate.getFullYear()}`;
-    const formattedTime = `${currentDate.getHours()}:${currentDate.getMinutes()}`;
+    const currentDate = new Date();
+    const orderDate = Timestamp.fromDate(currentDate); 
+
+    const startTimestamp = selectedStartDate ? Timestamp.fromDate(new Date(selectedStartDate)) : Timestamp.fromDate(new Date(startDate));
+    const endTimestamp = selectedEndDate ? Timestamp.fromDate(new Date(selectedEndDate)) : Timestamp.fromDate(new Date(endDate));
 
     const orderData = {
-      startDate: selectedStartDate || startDate,
-      endDate: selectedEndDate || endDate,
-      orderDate: formattedDate, 
-      orderTime: formattedTime, 
+      startDate: startTimestamp,
+      endDate: endTimestamp,
+      orderDate: orderDate,
       products: selectedProducts,
       user: userInfo,
     };
@@ -82,6 +84,8 @@ export const Cart = () => {
       await addDoc(ordersCollectionRef, orderData);
       alert('Order created successfully!');
       dispatch(PlaceOrder(orderData));
+      dispatch(clearCart());
+      handleResetDates();
       navigate("/");
     } catch (error) {
       console.error("Error creating order: ", error);
@@ -102,7 +106,7 @@ export const Cart = () => {
     setIsModalOpen(false);
   };
 
-  return (
+  return ( 
     <div className="cart">
       <div>
         <h1>Your Cart Items</h1>
@@ -134,3 +138,5 @@ export const Cart = () => {
     </div>
   );
 };
+
+export default Cart;

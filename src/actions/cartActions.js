@@ -3,7 +3,7 @@
 export const addToCart = (productId, quantity = 1) => {
   return {
     type: 'ADD_TO_CART', 
-    payload: {
+    payload: { 
       productId,
       quantity,
     },

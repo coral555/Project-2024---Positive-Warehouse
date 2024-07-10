@@ -1,24 +1,35 @@
-import React from "react";
-import { useDispatch } from "react-redux";
-import { removeFromCart, updateCartItemCount, addToCart } from "../../actions/cartActions";
-import { useCombined } from "../../context/CombinedContext";
+// src/components/CartItem.js
+
+import React from 'react';
+import { useDispatch } from 'react-redux';
+import { removeFromCart, updateCartItemCount, addToCart } from '../../actions/cartActions';
+import { useCombined } from '../../context/CombinedContext';
 
 export const CartItem = ({ data }) => {
   const { id, name, quantity, imageURL } = data;
   const dispatch = useDispatch();
-  const { products, productQuantities } = useCombined();
-  
+  const { products, productQuantities, setProductQuantities } = useCombined();
+
   const product = products.find((product) => product.id === id);
-  const remainingQuantity = product.quantity - (productQuantities[id] || 0);
+  const remainingQuantity = product ? product.quantity - (productQuantities[id] || 0) : 0;
 
   const removeFromCartHandler = () => {
-    dispatch(removeFromCart(id));
+    dispatch(removeFromCart(id, quantity));
+    setProductQuantities((prevQuantities) => {
+      const updatedQuantities = { ...prevQuantities };
+      delete updatedQuantities[id];
+      return updatedQuantities;
+    });
   };
 
   const updateCartItemCountHandler = (e) => {
     const count = parseInt(e.target.value, 10);
     if (count > 0 && count <= remainingQuantity) {
       dispatch(updateCartItemCount(id, count));
+      setProductQuantities((prevQuantities) => ({
+        ...prevQuantities,
+        [id]: (prevQuantities[id] || 0) + (count - quantity),
+      }));
     } else {
       alert('The quantity you have selected exceeds the available quantity.');
     }
@@ -26,7 +37,11 @@ export const CartItem = ({ data }) => {
 
   const increaseQuantityHandler = () => {
     if (quantity < remainingQuantity) {
-      dispatch(addToCart(id, 1)); // Assuming addToCart takes an id and quantity
+      dispatch(addToCart(id, 1));
+      setProductQuantities((prevQuantities) => ({
+        ...prevQuantities,
+        [id]: (prevQuantities[id] || 0) + 1,
+      }));
     } else {
       alert('The quantity you have selected exceeds the available quantity.');
     }
@@ -35,6 +50,10 @@ export const CartItem = ({ data }) => {
   const decreaseQuantityHandler = () => {
     if (quantity > 1) {
       dispatch(updateCartItemCount(id, quantity - 1));
+      setProductQuantities((prevQuantities) => ({
+        ...prevQuantities,
+        [id]: (prevQuantities[id] || 0) - 1,
+      }));
     }
   };
 

@@ -2,28 +2,28 @@ import React, { useState, useEffect } from "react";
 import { useCombined } from "../../../context/CombinedContext";
 import "./ManageOrders.css";
 import { Button, Modal, Form } from 'react-bootstrap';
-import { deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { deleteDoc, doc, updateDoc, query, collection, where, getDocs, getDoc, addDoc, Timestamp } from 'firebase/firestore';
 import { db } from "../../../utils/firebase";
-import { selectfetchProducts, addProductToOrder } from  "../../../utils/firebaseUtils";
+import { selectfetchProducts, addProductToOrder } from "../../../utils/firebaseUtils";
+import OrderFieldEditor from '../../components/OrderFieldEditor/OrderFieldEditor'; // Adjust the path as per your file structure
+import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'; 
 
 const ManageOrders = () => {
   const {
     searchOrders,
     orders,
-    category,
+    category, 
     categories,
     setCategory,
     subCategory,
     setSubCategory,
     subCategories,
   } = useCombined();
-  
-  const [searchTerm, setSearchTerm] = useState({
-    userEmail: "",
-    userName: "",
-    userPhone: ""
-  });
-
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalBody, setModalBody] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState({
     id: "",
@@ -36,8 +36,31 @@ const ManageOrders = () => {
   const [editedFields, setEditedFields] = useState({});
   const [selectedProductQuantity, setSelectedProductQuantity] = useState(null);
 
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp || !(timestamp instanceof Date)) return '';
+    const date = timestamp;
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+  };
+
+  const convertToTimestamp = (dateString) => {
+    const date = new Date(dateString);
+    return Timestamp.fromDate(date);
+  };
+
   const handleSearch = async () => {
-    await searchOrders(searchTerm);
+    if (searchTerm.trim() === "") {
+      return; 
+    }
+    const searchParams = {
+      userEmail: searchTerm.includes('@') ? searchTerm : "",
+      userName: !searchTerm.includes('@') && !/^\d+$/.test(searchTerm) ? searchTerm : "",
+      userPhone: /^\d+$/.test(searchTerm) ? searchTerm : ""
+    };
+    await searchOrders(searchParams);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
   };
 
   const handleEditField = (orderId, field, value) => {
@@ -47,19 +70,43 @@ const ManageOrders = () => {
 
   const updateOrderField = async (orderId, field, value) => {
     try {
-      await updateDoc(doc(db, "orders", orderId), { [field]: value });
-      await searchOrders(searchTerm); // Refresh orders after update
+      let updateValue = value;
+      if (['orderTime', 'endDate', 'startDate', 'orderDate'].includes(field)) {
+        updateValue = convertToTimestamp(value);
+      }
+
+      await updateDoc(doc(db, "orders", orderId), { [field]: updateValue });
+      await searchOrders({ userEmail: "", userName: "", userPhone: "" });
     } catch (error) {
       console.error('Error updating order field:', error);
     }
   };
-
+ 
   const handleDeleteOrder = async (orderId) => {
     try {
       await deleteDoc(doc(db, "orders", orderId));
-      await searchOrders(searchTerm); // Refresh orders after deletion
+      handleCloseModal();
+
+      await searchOrders({ userEmail: "", userName: "", userPhone: "" }); 
     } catch (error) {
       console.error('Error deleting order:', error);
+    }
+  };
+
+  const moveToOld = async (orderId) => {
+    try {
+      const orderRef = doc(db, "orders", orderId);
+      const orderSnapshot = await getDoc(orderRef);
+      const orderData = orderSnapshot.data();
+      const oldOrdersCollection = collection(db, "oldOrders");
+      await addDoc(oldOrdersCollection, orderData);
+      await deleteDoc(orderRef);
+      handleCloseModal();
+
+      await searchOrders({ userEmail: "", userName: "", userPhone: "" }, null); 
+
+    } catch (error) {
+      console.error('Error moving order to oldOrders or deleting order:', error);
     }
   };
 
@@ -68,12 +115,13 @@ const ManageOrders = () => {
       const orderToUpdate = orders.find(order => order.id === orderId);
       const updatedProducts = orderToUpdate.products.filter(product => product.id !== productId);
       await updateDoc(doc(db, "orders", orderId), { products: updatedProducts });
-      await searchOrders(searchTerm); // Refresh orders after product deletion
+      await searchOrders({ userEmail: "", userName: "", userPhone: "" }, null); 
+      
     } catch (error) {
       console.error('Error deleting product:', error);
     }
   };
-
+ 
   const handleEditProduct = async (orderId, productId, field, value) => {
     try {
       const orderToUpdate = orders.find(order => order.id === orderId);
@@ -81,7 +129,7 @@ const ManageOrders = () => {
         product.id === productId ? { ...product, [field]: value } : product
       );
       await updateDoc(doc(db, "orders", orderId), { products: updatedProducts });
-      await searchOrders(searchTerm); // Refresh orders after product editing
+      await searchOrders({ userEmail: "", userName: "", userPhone: "" }, null);
     } catch (error) {
       console.error('Error editing product:', error);
     }
@@ -92,7 +140,7 @@ const ManageOrders = () => {
       const orderToUpdate = orders.find(order => order.id === orderId);
       const updatedUser = { ...orderToUpdate.user, [field]: value };
       await updateDoc(doc(db, "orders", orderId), { user: updatedUser });
-      await searchOrders(searchTerm); // Refresh orders after user field editing
+      await searchOrders({ userEmail: "", userName: "", userPhone: "" }, null); 
     } catch (error) {
       console.error('Error editing user field:', error);
     }
@@ -108,9 +156,9 @@ const ManageOrders = () => {
           selectedQuantity: newProduct.selectedQuantity
         };
         await addProductToOrder(orderId, productData);
-        await searchOrders(searchTerm); // Refresh orders after adding product
+        await searchOrders({ userEmail: "", userName: "", userPhone: "" }, null); // Refresh orders after deletion
       } else {
-        alert("Selected quantity exceeds available quantity.");
+        alert("הכמות שנבחרה חורגת מהכמות הזמינה.");
       }
     } catch (error) {
       console.error('Error adding product:', error);
@@ -151,99 +199,100 @@ const ManageOrders = () => {
     }
   };
 
+  const handleFetchOldOrders = async () => {
+    const now = new Date();
+    const oldDateTimestamp = Timestamp.fromDate(now);
+    setSearchTerm('');
+    await searchOrders({ userEmail: "", userName: "", userPhone: "" }, oldDateTimestamp);
+  };
+
+  const openConfirmModal = (action, title, body) => {
+    setConfirmAction(() => action);
+    setModalTitle(title);
+    setModalBody(body);
+    setShowConfirmModal(true);
+  };
+
+  const handleCloseModal = () => setShowConfirmModal(false);
+
   return (
     <div className="manage-orders">
-      <h2>Manage Orders</h2>
+      <h2 className="title">ניהול הזמנות</h2>
       <div className="search-form">
         <input
           type="text"
-          placeholder="Search by Email, Name, or Phone"
-          value={searchTerm.userEmail}
-          onChange={(e) => setSearchTerm({ ...searchTerm, userEmail: e.target.value })}
+          placeholder="חפש לפי מייל, שם או מספר נייד"
+          onChange={handleSearchChange}
         />
-        <input
-          type="text"
-          placeholder="Search by Name"
-          value={searchTerm.userName}
-          onChange={(e) => setSearchTerm({ ...searchTerm, userName: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="Search by Phone"
-          value={searchTerm.userPhone}
-          onChange={(e) => setSearchTerm({ ...searchTerm, userPhone: e.target.value })}
-        />
-        <button onClick={handleSearch}>Search</button>
+        <button onClick={handleSearch}>חיפוש</button>
+        <button onClick={handleFetchOldOrders}>הזמנות ישנות</button>
       </div>
-
       <div className="orders-list">
         {orders.map((order) => (
           <div key={order.id} className="order">
             <h3>Order ID: {order.id}</h3>
             <div className="order-details">
-              <p>
-                <strong>Order Date:</strong> {order.orderDate}
-                <Button variant="link" onClick={() => handleEditField(order.id, "orderDate", prompt("Enter new order date:", order.orderDate))}>
-                  ✏️
-                </Button>
-              </p>
-              <p>
-                <strong>Start Date:</strong> {order.startDate}
-                <Button variant="link" onClick={() => handleEditField(order.id, "startDate", prompt("Enter new start date:", order.startDate))}>
-                  ✏️
-                </Button>
-              </p>
-              <p>
-                <strong>End Date:</strong> {order.endDate}
-                <Button variant="link" onClick={() => handleEditField(order.id, "endDate", prompt("Enter new end date:", order.endDate))}>
-                  ✏️
-                </Button>
-              </p>
-              <p>
-                <strong>Order Time:</strong> {order.orderTime}
-                <Button variant="link" onClick={() => handleEditField(order.id, "orderTime", prompt("Enter new order time:", order.orderTime))}>
-                  ✏️
-                </Button>
-              </p>
-              <strong>User:</strong> <br />
-              <p>
-                Email: {order.user.email}
-                <Button variant="link" onClick={() => handleEditUserField(order.id, "email", prompt("Enter new email:", order.user.email))}>
-                  ✏️
-                </Button>
-              </p>
-              <p>
-                Name: {order.user.name}
-                <Button variant="link" onClick={() => handleEditUserField(order.id, "name", prompt("Enter new name:", order.user.name))}>
-                  ✏️
-                </Button>
-              </p>
-              <p>
-                Phone: {order.user.phone}
-                <Button variant="link" onClick={() => handleEditUserField(order.id, "phone", prompt("Enter new phone number:", order.user.phone))}>
-                  ✏️
-                </Button>
-              </p>
-            </div>
+              <OrderFieldEditor
+                orderId={order.id}
+                fieldName="orderDate"
+                currentValue={formatTimestamp(order.orderDate)}
+                handleEditField={handleEditField}
+              />
+              <OrderFieldEditor
+                orderId={order.id}
+                fieldName="startDate"
+                currentValue={formatTimestamp(order.startDate)}
+                handleEditField={handleEditField}
+              />
+              <OrderFieldEditor
+                orderId={order.id}
+                fieldName="endDate"
+                currentValue={formatTimestamp(order.endDate)}
+                handleEditField={handleEditField}
+              />
 
+              <strong>פרטי הלקוח:</strong> <br />
+              <OrderFieldEditor
+                orderId={order.id}
+                fieldName="email"
+                currentValue={order.user.email}
+                handleEditField={(id, field, value) => handleEditUserField(id, 'email', value)}
+              />
+              <OrderFieldEditor
+                orderId={order.id}
+                fieldName="name"
+                currentValue={order.user.name}
+                handleEditField={(id, field, value) => handleEditUserField(id, 'name', value)}
+              />
+              <OrderFieldEditor
+                orderId={order.id}
+                fieldName="phone"
+                currentValue={order.user.phone}
+                handleEditField={(id, field, value) => handleEditUserField(id, 'phone', value)}
+              />
+            </div>
+            <strong>מוצרים שהלקוח הזמין:</strong>
             <ul>
-              <strong>Products:</strong>
               {order.products.map((product) => (
                 <li key={product.id}>
                   <p>Product ID: {product.id}</p>
                   <p>{product.productName}</p>
-                  <p>Quantity: {product.selectedQuantity}</p>
-                  <Button onClick={() => handleEditProduct(order.id, product.id, 'selectedQuantity', product.selectedQuantity + 1)}>Increase Quantity</Button>
-                  <Button onClick={() => handleEditProduct(order.id, product.id, 'selectedQuantity', product.selectedQuantity - 1)}>Decrease Quantity</Button>
-                  <Button onClick={() => handleDeleteProduct(order.id, product.id)}>Delete Product</Button>
+                  <p>כמות: {product.selectedQuantity}</p>
+                  <Button onClick={() => handleEditProduct(order.id, product.id, 'selectedQuantity', product.selectedQuantity + 1)}>הגדלת הכמות</Button>
+                  <Button onClick={() => {
+                    if (product.selectedQuantity > 1) {
+                      handleEditProduct(order.id, product.id, 'selectedQuantity', product.selectedQuantity - 1);
+                    }
+                  }}>הורדת הכמות</Button>
+                  <Button onClick={() => handleDeleteProduct(order.id, product.id)}>מחיקת מוצר</Button>
                 </li>
               ))}
             </ul>
-
+            <strong>הוספת מוצרים להזמנה זו:</strong>
             <Form.Group controlId="categorySelect">
-              <Form.Label>Category</Form.Label>
+              <Form.Label>בחר קטגוריה </Form.Label>
               <Form.Control as="select" value={selectedCategory} onChange={handleCategoryChange}>
-                <option value="">All Categories</option>
+                <option value="">כל הקטגוריות</option>
                 {categories.map(category => (
                   <option key={category.id} value={category.name}>
                     {category.name}
@@ -253,9 +302,9 @@ const ManageOrders = () => {
             </Form.Group>
             <p>
             <Form.Group controlId="subCategorySelect">
-              <Form.Label>Subcategory</Form.Label>
+              <Form.Label>בחר תת קטגוריה </Form.Label>
               <Form.Control as="select" value={selectedSubCategory} onChange={handleSubCategoryChange} disabled={!selectedCategory}>
-                <option value="">All Subcategories</option>
+                <option value="">כל תתי הקטגוריות</option>
                 {subCategories.map((subCat, index) => (
                   <option key={index} value={subCat}>
                     {subCat}
@@ -266,23 +315,23 @@ const ManageOrders = () => {
             </p>
             <p>
             <Form.Group controlId="productSelect">
-              <Form.Label>Product</Form.Label>
+              <Form.Label>בחר מוצר </Form.Label>
               <Form.Control as="select" value={newProduct.id} onChange={handleProductChange}>
-                <option value="">Select Product</option>
+                <option value="">שם המוצר</option>
                 {products.map(product => (
                   <option key={product.id} value={product.id}>
-                    {product.name} (Remaining Quantity: {product.quantity})
+                    {product.name} (הכמות במלאי: {product.quantity})
                   </option>
                 ))}
               </Form.Control>
               {selectedProductQuantity !== null && (
-                <p>Remaining Quantity: {selectedProductQuantity}</p>
+                <p>הכמות במלאי: {selectedProductQuantity}</p>
               )}
             </Form.Group>
             </p>
             <p>
             <Form.Group controlId="quantityInput">
-              <Form.Label>Quantity</Form.Label>
+              <Form.Label>בחר כמות </Form.Label>
               <Form.Control
                 type="number"
                 placeholder="Quantity"
@@ -293,15 +342,21 @@ const ManageOrders = () => {
             </p>
             <Button
               onClick={() => handleAddProduct(order.id)}
-              disabled={newProduct.selectedQuantity > selectedProductQuantity}
-            >
-              Add Product
-            </Button>
-            <Button onClick={() => handleDeleteOrder(order.id)}>Delete Order</Button>
+              disabled={newProduct.selectedQuantity > selectedProductQuantity}>הוספת המוצר</Button>
+            <Button onClick={() => openConfirmModal(() => handleDeleteOrder(order.id), "מחיקת הזמנה", "האם אתה בטוח שברצונך למחוק הזמנה זו? (לא תוכל לשחזר)")}>מחיקת הזמנה</Button>
+            <Button onClick={() => openConfirmModal(() => moveToOld(order.id), "העברה לתקיה של הזמנות ישנות", "האם אתה בטוח שברצונך להעביר הזמנה זו לתיקיית הזמנות ישנות? (לא תוכל להחזיר)")}>העברה לתיקיית הזמנות ישנות</Button>
+
           </div>
         ))}
         
       </div>
+      <ConfirmModal
+        show={showConfirmModal}
+        handleClose={handleCloseModal}
+        handleConfirm={confirmAction}
+        title={modalTitle}
+        body={modalBody}
+      />
     </div>
   );
 };

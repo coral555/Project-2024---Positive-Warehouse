@@ -13,4 +13,4 @@ export const Product = ({ data }) => {
       </div>
     </div>
   );
-};
+}; 

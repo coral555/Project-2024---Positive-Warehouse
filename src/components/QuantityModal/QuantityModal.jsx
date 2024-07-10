@@ -5,15 +5,16 @@ import "./QuantityModal.css";
 
 const QuantityModal = ({ isOpen, onClose, onAddToCart }) => {
   const [quantity, setQuantity] = useState(1);
-  const handleQuantityChange = (e) => {
+  const handleQuantityChange = (e) => { 
     setQuantity(Number(e.target.value));
   };
-  const handleAddToCart = () => {
+  const handleAddToCart = () => { 
     onAddToCart(quantity);
+    setQuantity('');
     onClose();
   };
   if (!isOpen) return null;
-  
+   
   return (
     <div className="modal-overlay">
       <div className="modal-content">
