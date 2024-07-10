@@ -20,6 +20,7 @@ import EditInventory from './manager/pages/EditInventory/EditInventory';
 import LoginPage from './pages/Login/LoginPage';
 import ManageOrders from './manager/pages/ManageOrders/ManageOrders';
 import ManageCategories from './manager/pages/ManageCategories/ManageCategories';
+import Reports from './manager/pages/Reports/Reports';
 
 
 
@@ -99,8 +100,20 @@ function App() {
                   )
                 }
               />
+              <Route
+                path="/Reports"
+                element={
+                  isAuthenticated ? (
+                    <>
+                      <NavbarManger />
+                      <ProtectedRoute isAuthenticated={isAuthenticated} element={<Reports />} />
+                    </>
+                  ) : (
+                    <Navigate to="/LoginPage" replace />
+                  )
+                }
+              />
             </Routes>
-            
           </Router>
         </Provider>
       </CombinedProvider>
