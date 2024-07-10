@@ -1,139 +1,85 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f9;
-    color: #333;
-}
-
-.navBar {
-    background-color: #4CAF50;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.contactPage{
+h2{
     direction: rtl;
-
+    font-size: 40;
+    font-family: 'Times New Roman', Times, serif;
 }
-.logo-link {
+
+h4{
+    margin-left: 600px; 
+    font-size: 35;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.contact-page {
     display: flex;
-    align-items: center;
-}
-
-.logo {
-    width: 150px;
-    height: 50px;
-}
-
-#buttons {
-    display: flex;
-    gap: 15px;
-    flex-grow: 1;
-}
-
-.manager-button {
-    background-color: #FF6F61; /* Example for different styling */
-}
-
-button {
-    background-color: #ffffff;
-    border: 2px solid #4CAF50;
-    border-radius: 5px;
-    color: #4CAF50;
-    padding: 10px 20px;
-    margin: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.contactBanner {
-    background: url('https://infoteknextjs.vercel.app/assets/img/breadcrumb.jpg') no-repeat center center;
-    background-size: cover;
-    height: 400px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    text-align: center;
-}
-
-.bannerContent {
-    background-color: rgba(0, 0, 0, 0.5);
-    padding: 20px;
-    border-radius: 10px;
-}
-
-.contactSection {
-    margin: 20px;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    text-align: right;
-}
-
-.contactDetails {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 20px;
-}
-
-.contactPerson {
-    display: flex;
-    align-items: center;
-    background-color: DarkSeaGreen;
-    border-radius: 10px;
-    padding: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    color: #fff;
-    width: 48%;
-}
-
-.contactPerson img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    margin-right: 10px; /* Changed margin to right */
-}
-
-.contactPerson .contactInfo {
-    text-align: right;
-}
-
-.contactPerson h3, .contactPerson p {
-    margin: 0;
-}
-
-.contactPerson p {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-}
-
-.contactPerson p i {
-    margin-left: 5px;
-}
-
-.contactEmail {
-    margin-top: 40px;
-    text-align: center;
-}
-
-.contactEmail h2 {
-    font-size: 24px;
-}
-
-.contactEmail p {
-    font-size: 18px;
-    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    min-height: 10vh;
+    padding: 50px;
+    background-color: #E6E8E6;
 }
 
-.contactEmail p i {
+.page-title {
+    font-size: 40px;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.phone-icon {
+    width: 30px; /* Adjust the size as needed */
+    height: auto;
     margin-left: 10px;
+    direction: rtl;
+}
+
+.contact-form-container {
+    display: flex;
+    background-color: #E6E8E6;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(2, 138, 47, 0.343);
+    width: 80%;
+    max-width: 1200px;
+    overflow: hidden;
+}
+
+.details-bar-wrapper {
+    background: linear-gradient(-90.21deg, rgba(0, 77, 13, 0.902) -5.91%, rgba(125, 125, 125, 0.173) 130.58%);
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+.text-wrapper {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.text-one {
+    font-size: 35px;
+    color: black;
+    font-weight: bold; 
+    margin-bottom: 5px;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.text-two {
+    font-size: 20px;
+    line-height: 1.5;
+    color: black;
+    font-weight: lighter;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.contact-email {
+    text-align: center;
+    margin-bottom: 40px;
+
+}
+
+.contact-section {
+    flex: 2;
+    padding: 10px;
 }

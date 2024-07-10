@@ -37,7 +37,7 @@ export const CombinedProvider = ({ children }) => {
   const [isFetchingAll, setIsFetchingAll] = useState(true);
   const [categoriesFetched, setCategoriesFetched] = useState(false);
   const [category, setCategory] = useState('');
-  const [subCategory, setSubCategory] = useState('');
+  const [subCategory, setSubCategory] = useState(''); 
   const [subCategories, setSubCategories] = useState([]);
 
 
@@ -45,13 +45,27 @@ export const CombinedProvider = ({ children }) => {
     fetchData(fetchCategories, setLoading, setError, setCategories);
   }, []);
 
+  const handleResetDates = () => {
+    setStartDate(null);
+    setEndDate(null);
+    localStorage.removeItem('startDate');
+    localStorage.removeItem('endDate');
+    setCategory('');
+    setSubCategory('');
+    setSubCategories([]);
+    clearQuantities();
+    clearCart();
+  };
   const fetchInitialProducts = useCallback(() => {
+
     setLoading(true);
     setError(null);
     fetchProducts(5, null, category, subCategory)
       .then(({ productList, lastVisible }) => {
         setProducts(productList);
         setLastVisible(lastVisible);
+        setIsFetchingAll(true);
+
       })
       .catch((error) => {
         console.error("Error fetching products:", error);
@@ -63,9 +77,12 @@ export const CombinedProvider = ({ children }) => {
   }, [category, subCategory]);
 
   const fetchMoreProducts = async () => {
+    console.log(products);
+
     if (!lastVisible || isFetchingMore) return;
-    setIsFetchingMore(true);
+      setIsFetchingMore(true);
     try {
+
       const { productList, lastVisible: newLastVisible } = await fetchProducts(5, lastVisible, category, subCategory);
       if (productList.length === 0) {
         setIsFetchingAll(false);
@@ -156,21 +173,26 @@ export const CombinedProvider = ({ children }) => {
     },
     [productQuantities]
   );
+  const clearQuantities = () => {
+    setProductQuantities({});
+  };
 
   const clearCart = () => {
     setProductQuantities({});
   };
-  const searchOrders = async (searchParams) => {
-    const fetchedOrders = await fetchOrdersWithConditions(searchParams);
+  const searchOrders = async (searchParams, olddate = null) => {
+    const fetchedOrders = await fetchOrdersWithConditions(searchParams, olddate);
     setOrders(fetchedOrders);
   };
   return (
     <CombinedContext.Provider
       value={{
+        setProducts,
         products,
         categories,
         loading,
         error,
+        handleResetDates,
         productQuantities,
         setProductQuantities,
         isModalOpen,
@@ -198,6 +220,7 @@ export const CombinedProvider = ({ children }) => {
         setSubCategories,
         isFetchingAll,
         searchOrders ,
+        clearQuantities,
       }}
     >
       {children}

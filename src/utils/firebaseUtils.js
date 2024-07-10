@@ -2,6 +2,7 @@
 import { collection, addDoc,getDocs, doc,query, getDoc,updateDoc,orderBy, limit,where, startAfter } from "firebase/firestore";
 import { db, storage } from "./firebase";
 import { ref, getDownloadURL } from "firebase/storage";
+import { Timestamp } from 'firebase/firestore';
 
 export const fetchProducts = async (pageSize = 5, startAfterDoc = null, category = '', subCategory = '') => {
   let productsQuery = query(
@@ -40,6 +41,9 @@ export const fetchProducts = async (pageSize = 5, startAfterDoc = null, category
 
 
 export const selectfetchProducts = async (category = '', subCategory = '') => {
+  if(!category){
+return [];
+  } 
   try {
     let q = query(collection(db, "products"));
     
@@ -80,17 +84,20 @@ export const fetchCategories = async () => {
 
 export const fetchOrders = async (startDate, endDate) => {
   const ordersCollection = collection(db, "orders");
+  const startDateTimestamp = Timestamp.fromDate(new Date(startDate)); 
+  const endDateTimestamp = Timestamp.fromDate(new Date(endDate)); 
+
 
   const startDateInRangeQuery = query(
     ordersCollection,
-    where("startDate", ">=", startDate),
-    where("startDate", "<=", endDate)
+    where("startDate", ">=", startDateTimestamp),
+    where("startDate", "<=", endDateTimestamp)
   );
 
   const endDateInRangeQuery = query(
     ordersCollection,
-    where("endDate", ">=", startDate),
-    where("endDate", "<", endDate)
+    where("endDate", ">=", startDateTimestamp),
+    where("endDate", "<", endDateTimestamp)
   );
 
   const [startDateSnapshot, endDateSnapshot] = await Promise.all([
@@ -111,28 +118,50 @@ export const fetchOrders = async (startDate, endDate) => {
   const ordersList = [...startDateOrders, ...endDateOrders];
   return ordersList ;
 };
-export const fetchOrdersWithConditions = async ({ userEmail, userName, userPhone }) => {
+export const fetchOrdersWithConditions = async ({ userEmail, userName, userPhone }, olddate) => {
   const ordersCollection = collection(db, "orders");
   let ordersQuery = query(ordersCollection);
+ 
+  if (olddate) {
+    console.log(olddate);
+    ordersQuery = query(ordersQuery, where("endDate", "<", olddate), where("startDate", "<", olddate));
+  } else {
+    if (userEmail) {
+      ordersQuery = query(ordersQuery, where("user.email", "==", userEmail));
+    }
 
-  if (userEmail) {
-    ordersQuery = query(ordersQuery, where("user.email", "==", userEmail));
-  }
+    if (userName) {
+      ordersQuery = query(ordersQuery, where("user.name", "==", userName));
+    }
 
-  if (userName) {
-    ordersQuery = query(ordersQuery, where("user.name", "==", userName));
-  }
-
-  if (userPhone) {
-    ordersQuery = query(ordersQuery, where("user.phone", "==", userPhone));
+    if (userPhone) {
+      ordersQuery = query(ordersQuery, where("user.phone", "==", userPhone));
+    }
   }
 
   try {
     const orderSnapshot = await getDocs(ordersQuery);
-    const ordersList = orderSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    const ordersList = orderSnapshot.docs.map(doc => {
+      const data = doc.data();
+      if (data.orderDate instanceof Timestamp) {
+        data.orderDate = data.orderDate.toDate();
+      }
+      if (data.startDate instanceof Timestamp) {
+        data.startDate = data.startDate.toDate();
+      }
+      if (data.endDate instanceof Timestamp) {
+        data.endDate = data.endDate.toDate();
+      }
+      if (data.orderTime instanceof Timestamp) {
+        data.orderTime = data.orderTime.toDate();
+      }
+      return {
+        id: doc.id,
+        ...data
+      };
+    });
+    console.log(ordersList);
+
     return ordersList;
   } catch (error) {
     console.error("Error fetching orders:", error);
@@ -140,28 +169,24 @@ export const fetchOrdersWithConditions = async ({ userEmail, userName, userPhone
   }
 };
 
+
 export const addProductToOrder = async (orderId, product) => {
   try {
-    // Create a reference to the specific order document
     const orderRef = doc(db, 'orders', orderId);
-
-    // Fetch the order document
     const orderDoc = await getDoc(orderRef);
 
     if (orderDoc.exists()) {
       const orderData = orderDoc.data();
-
-      // Update the products array in the order document
       const updatedProducts = [...orderData.products, product];
       await updateDoc(orderRef, { products: updatedProducts });
     } else {
-      throw new Error('Order document not found'); // Throw an error if document not found
+      throw new Error('Order document not found');
     }
   } catch (error) {
     console.error('Error adding product to order:', error);
-    throw error; // Rethrow the error to handle it in the caller function
+    throw error;
   }
-};
+}; 
 
 export const placeOrder = async (order) => {
   try {
@@ -171,15 +196,4 @@ export const placeOrder = async (order) => {
   } catch (e) {
     console.error("Error adding document: ", e);
   }
-};
-
-export const fetchOldOrders = async () => {
-  const categoriesCollection = collection(db, "oldOrders");
-  const categorySnapshot = await getDocs(categoriesCollection);
-  const orderList = categorySnapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  }))
-
-  return orderList;
 };

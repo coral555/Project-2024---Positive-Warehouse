@@ -29,6 +29,7 @@ const EditInventory = () => {
         setCategory,
         setSubCategory,
         isFetchingAll,
+        setProducts,
     } = useCombined();
     const [imageURLs, setImageURLs] = useState({});
     const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -77,6 +78,8 @@ const EditInventory = () => {
 
     const confirmDeleteProduct = () => {
         handleDeleteProduct(deleteConfirmation.product, setImageURLs);
+        const updatedProducts = products.filter(product => product.id !== deleteConfirmation.product.id);
+        setProducts(updatedProducts);  
         setDeleteConfirmation({ isOpen: false, product: null });
     };
 
@@ -107,18 +110,33 @@ const EditInventory = () => {
 
     const handleSubmitEdit = () => {
         const updatedProduct = { ...currentProduct, [currentField]: currentValue };
-
         if (currentField === 'quantity') {
             handleQuantityChange(currentProduct, currentValue);
         } else {
             handleDescriptionChange(currentProduct, currentValue);
         }
-
-        dispatch(setEditedProducts({ [currentProduct.id]: updatedProduct }));
-
+        dispatch(setEditedProducts({[currentProduct.id]: updatedProduct }));
         closeModal();
     };
+    const customModalStyles = {
+        content: {
+            top: '50%',
+            left: '50%',
+            right: 'auto',
+            bottom: 'auto',
+            marginRight: '-50%',
+            transform: 'translate(-50%, -50%)',
+            width: '200px',
+            height: '130px',
+            justifyContent: 'center',
+            alignItems: 'center',
+            position: 'absolute',
 
+        },
+        overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        },
+    };
     return (
         <div className="edit-inventory-container">
             <h2>ערוך מלאי</h2>
@@ -169,8 +187,7 @@ const EditInventory = () => {
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
                 contentLabel="Edit Field"
-                className="small-modal"
-                overlayClassName="small-modal-overlay"
+                style={customModalStyles}
             >
                 <h2>Edit {currentField}</h2>
                 {currentField && currentProduct && (
@@ -193,8 +210,7 @@ const EditInventory = () => {
                 isOpen={deleteConfirmation.isOpen}
                 onRequestClose={cancelDeleteProduct}
                 contentLabel="Confirm Delete"
-                className="small-modal"
-                overlayClassName="small-modal-overlay"
+                style={customModalStyles}
             >
                 <h2>אשר מחיקה</h2>
                 <p>האם אתה בטוח שברצונך למחוק את המוצר: {deleteConfirmation.product && deleteConfirmation.product.description}?</p>

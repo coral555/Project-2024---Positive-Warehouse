@@ -1,17 +1,18 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useRef, useEffect, useMemo } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ClipLoader from "react-spinners/ClipLoader";
-import { useCombined } from "../../context/CombinedContext";
-import { Product } from "../../components/product/product";
 import { useDispatch } from "react-redux";
 import { clearCart } from "../../actions/cartActions";
+import { useCombined } from "../../context/CombinedContext";
+import { Product } from "../../components/product/product";
 import "./ViewInventory.css";
 
 export const View = () => {
   const {
     products,
+    setProducts,
     categories,
     loading,
     error,
@@ -23,15 +24,57 @@ export const View = () => {
     setSubCategory,
     subCategories,
     isFetchingAll,
+    isModalOpen,
+    setIsModalOpen,
+    selectedProductId,
+    setSelectedProductId,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
+    getRemainingQuantity,
+    setSubCategories,
+    clearQuantities,
+    handleResetDates,
   } = useCombined();
-  
+
   const [showCalendar, setShowCalendar] = useState(false);
   const [tempDate, setTempDate] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [originalProducts, setOriginalProducts] = useState([]);
   const navigate = useNavigate();
   const calendarRef = useRef(null);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    setOriginalProducts(products);
+  }, [products]);
+
+  useEffect(() => {
+    const initialStartDate = localStorage.getItem('startDate') ? parseInt(localStorage.getItem('startDate'), 10) : null;
+    const initialEndDate = localStorage.getItem('endDate') ? parseInt(localStorage.getItem('endDate'), 10) : null;
   
+    setStartDate(initialStartDate);
+    setEndDate(initialEndDate);
+  }, [setStartDate, setEndDate]);
+
+  useEffect(() => {
+    setSelectedProductId(null);
+    setIsModalOpen(false);
+  }, [setSelectedProductId, setIsModalOpen]);
+
+  useEffect(() => {
+    if (category) {
+      const selectedCategory = categories.find(cat => cat.name === category);
+      if (selectedCategory && selectedCategory.subCategory) {
+        setSubCategories(selectedCategory.subCategory);
+      } else {
+        setSubCategories([]);
+      }
+    } else {
+      setSubCategories([]);
+    }
+  }, [category, categories, setSubCategories]);
+
   const handleCategoryChange = (event) => {
     setCategory(event.target.value);
     setSubCategory('');
@@ -47,14 +90,16 @@ export const View = () => {
 
   const handleConfirmDate = () => {
     if (tempDate) {
-      const startDate = new Date(tempDate.setHours(0, 0, 0, 0));
+      handleResetDates();
+      const startDate = new Date(tempDate.setHours(0, 0, 0, 0)).getTime();
       const endDate = new Date(startDate);
-      endDate.setDate(startDate.getDate() + 2);
-
-      setSelectedDate(startDate);
+      endDate.setDate(endDate.getDate() + 2);
+      const endDateTimestamp = endDate.getTime();
+      setStartDate(startDate);
+      setEndDate(endDateTimestamp);
+      localStorage.setItem('startDate', startDate.toString());
+      localStorage.setItem('endDate', endDateTimestamp.toString());
       dispatch(clearCart());
-      const uniqueKey = Date.now();
-      navigate(`/CreateOrder?key=${uniqueKey}`, { state: { startDate, endDate } });
       setShowCalendar(false);
     }
   };
@@ -87,6 +132,19 @@ export const View = () => {
     return isPastDate(date) ? "past-date" : "";
   };
 
+  const remainingQuantities = useMemo(() => {
+    return products.reduce((acc, product) => {
+      const remainingQuantity = getRemainingQuantity(product.id, product.quantity);
+      acc[product.id] = remainingQuantity;
+      return acc;
+    }, {});
+  }, [products, getRemainingQuantity]);
+
+
+  const handleReset = () => {
+    handleResetDates();
+    dispatch(clearCart());
+  };
   if (loading) {
     return (
       <div className="loading">
@@ -107,6 +165,9 @@ export const View = () => {
     <div className="storage">
       <div className="storageTitle">
         <h1>Positive Inventory</h1>
+        {startDate && <p>Start Date: {new Date(startDate).toLocaleDateString()}</p>}
+        {endDate && <p>End Date: {new Date(endDate).toLocaleDateString()}</p>}
+        <button onClick={handleReset}>Reset Dates</button>
       </div>
 
       <div className="filters">
@@ -144,18 +205,28 @@ export const View = () => {
         </div>
       )}
 
-      <div className="products">
-        {products.length > 0 ? (
-          products.map((product) => (
-            <Link to={`/product/${product.id}`} key={product.id}>
-              <Product data={product} />
-            </Link>
-          ))
-        ) : (
-          <p>No products found.</p>
-        )}
-      </div>
+    <div className="products">
 
+      {originalProducts.length > 0 ? (
+        originalProducts.map((product) => (
+          <div
+            key={product.id}
+            className={remainingQuantities[product.id] > 0 ? "" : "unavailable"}
+          >
+            <Link to={`/product/${product.id}`}>
+              <Product
+                data={{
+                  ...product,
+                  quantity: remainingQuantities[product.id],
+                }}
+              />
+            </Link>
+          </div>
+        ))
+      ) : (
+        <p>No products found.</p>
+      )}
+    </div>
       <div className="load-more">
         {isFetchingAll ? (
           <button className="load-more-button" onClick={fetchMoreProducts} disabled={isFetchingMore}>
