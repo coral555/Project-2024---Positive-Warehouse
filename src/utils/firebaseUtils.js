@@ -180,10 +180,6 @@ export const fetchOldOrders = async () => {
     id: doc.id,
     ...doc.data()
   }))
-  // const categoryList = categorySnapshot.docs.map(doc => ({
-  //   id: doc.id,
-  //   name: doc.data().name,
-  //   subCategory: doc.data().subcategory || []
-  // }));
+
   return orderList;
 };
