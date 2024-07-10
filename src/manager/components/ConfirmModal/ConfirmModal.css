@@ -1,0 +1,8 @@
+/* Add this to your CSS file or inside a <style> tag in your HTML file */
+.custom-modal .modal-dialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  

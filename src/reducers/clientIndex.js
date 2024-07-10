@@ -23,7 +23,7 @@ const cartReducer = (state = initialState, action) => {
     case 'CLEAR_CART':
       return {};
     case 'PLACE_ORDER':
-      return {}; // Clear cart on order placement
+      return {}; 
     default:
       return state;
   }

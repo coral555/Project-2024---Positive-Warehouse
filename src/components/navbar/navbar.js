@@ -16,31 +16,31 @@ export const Navbar = () => {
   return (
     <div className="navbar">
       <div className="left-links">
-        <NavLink to="/loginPage" activeClassName="active-link">
-          <IoLogInOutline size={30}  style={isActive("/loginPage") ? { color: "#33e900" } : {}} />
+        <NavLink to="/loginPage" className={isActive("/loginPage")}>
+          <IoLogInOutline size={30} style={isActive("/loginPage") ? { color: "#33e900" } : {}} />
         </NavLink>
       </div>
       <div className="middle-left">
-        <NavLink to="/cart" className="cart-link" activeClassName="active-link">
+        <NavLink to="/cart" className={`cart-link ${isActive("/cart")}`}>
           <IoCartOutline size={30} style={isActive("/cart") ? { color: "#33e900" } : {}} />
           {Object.keys(cartItems).length > 0 && orderPlaced && (
             <span className="cart-notification" />
           )}
-        </NavLink>
+        </NavLink> 
       </div>
       <div className="links">
-        <NavLink to="/AboutWarehouse" activeClassName="active-link" className={isActive("/AboutWarehouse")}>
+        <NavLink to="/AboutWarehouse" className={isActive("/AboutWarehouse")}>
           מי אנחנו
         </NavLink>
-        <NavLink to="/ViewInventory" activeClassName="active-link" className={isActive("/ViewInventory")}>
+        <NavLink to="/ViewInventory" className={isActive("/ViewInventory")}>
           הצגה
         </NavLink>
-        <NavLink exact to="/" activeClassName="active-link" className={isActive("/")}>
-          <IoHomeOutline size={30} style={isActive("/") ? { color: "#33e900" } : {}} />
+        <NavLink exact="true" to="/" className={isActive("/")}>
+          <IoHomeOutline size={32} />
         </NavLink>
       </div>
-      <NavLink to="/contact" className={`support-icon ${isActive("/contact")}`} activeClassName="active-link">
-      <IoCallOutline size={38} style={isActive("/contact") ? { color: "#33e900" } : {}} />
+      <NavLink to="/contact" className={`support-icon ${isActive("/contact")}`}>
+        <IoCallOutline size={38} style={isActive("/contact") ? { color: "#33e900" } : {}} />
       </NavLink>
       <a
         href="https://payboxapp.page.link/ByZyKCSDAWy7Y4eL9"

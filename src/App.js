@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Navbar } from './components/navbar/navbar';
 import { NavbarManger } from './manager/components/navbar/navbar';
-import CreateOrder from './pages/order/CreateOrder';
 import { Cart } from './pages/cart/cart';
 import {Home} from './pages/Home/Home';
 import { View } from './pages/ViewInventory/ViewInventory';
@@ -20,6 +19,9 @@ import ProtectedRoute from './pages/Login/ProtectedRoute';
 import EditInventory from './manager/pages/EditInventory/EditInventory';
 import LoginPage from './pages/Login/LoginPage';
 import ManageOrders from './manager/pages/ManageOrders/ManageOrders';
+import ManageCategories from './manager/pages/ManageCategories/ManageCategories';
+
+
 
 const store = createStore(rootReducer);
 
@@ -42,7 +44,6 @@ function App() {
               <Route path="/ViewInventory" element={<View />} />
               <Route path="/AboutWarehouse" element={<AboutWarehouse />} />
               <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="/CreateOrder" element={<CreateOrder />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/LoginPage" element={<LoginPage onLogin={handleLogin} />} />
@@ -85,7 +86,21 @@ function App() {
                   )
                 }
               />
+              <Route
+                path="/ManageCategories"
+                element={
+                  isAuthenticated ? (
+                    <>
+                      <NavbarManger />
+                      <ProtectedRoute isAuthenticated={isAuthenticated} element={<ManageCategories />} />
+                    </>
+                  ) : (
+                    <Navigate to="/LoginPage" replace />
+                  )
+                }
+              />
             </Routes>
+            
           </Router>
         </Provider>
       </CombinedProvider>
