@@ -38,7 +38,7 @@ function Contact() {
                         <div className="contact-person">
                             <h2>
                                 <img src={phoneIcon} alt="Phone icon" className="phone-icon" />
-                                מוטי כהן
+                                מוטיי כהן
                             </h2>
                             <h4>050 - 5994488</h4>
                         </div>
