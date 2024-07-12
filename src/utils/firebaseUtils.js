@@ -199,8 +199,8 @@ export const placeOrder = async (order) => {
 };
 
 
-export const fetchOldOrders = async () => {
-  const categoriesCollection = collection(db, "oldOrders");
+export const fetchCollection = async (collectionName) => {
+  const categoriesCollection = collection(db, collectionName);
   const categorySnapshot = await getDocs(categoriesCollection);
   const orderList = categorySnapshot.docs.map(doc => ({
     id: doc.id,
