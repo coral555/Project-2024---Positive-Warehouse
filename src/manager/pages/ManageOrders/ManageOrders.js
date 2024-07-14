@@ -8,6 +8,8 @@ import { selectfetchProducts, addProductToOrder } from "../../../utils/firebaseU
 import OrderFieldEditor from '../../components/OrderFieldEditor/OrderFieldEditor'; // Adjust the path as per your file structure
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'; 
 
+import {notifiyLateOrder} from '../../../utils/emailSender';
+
 const ManageOrders = () => {
   const {
     searchOrders,
@@ -35,6 +37,26 @@ const ManageOrders = () => {
   const [selectedSubCategory, setSelectedSubCategory] = useState('');
   const [editedFields, setEditedFields] = useState({});
   const [selectedProductQuantity, setSelectedProductQuantity] = useState(null);
+
+  const [showEmailSentModal, setShowEmailSentModal] = useState(false);
+
+  const handleNotifyCreator = function(order) {
+    return (target) => {
+
+      const endDate = new Date(order.endDate); // Ensure endDate is a Date object
+      const currentDate = new Date();
+      const day_since_return_date = Math.floor((currentDate - endDate) / (1000 * 60 * 60 * 24));
+
+      notifiyLateOrder({
+        name:  order.user.name,
+        email: order.user.email,
+        days_since_return_date: day_since_return_date
+      }, order.products);
+
+      setShowEmailSentModal(true); // Show the "Email Sent" modal
+
+    }
+  }
 
   const formatTimestamp = (timestamp) => {
     if (!timestamp || !(timestamp instanceof Date)) return '';
@@ -346,6 +368,23 @@ const ManageOrders = () => {
             <Button onClick={() => openConfirmModal(() => handleDeleteOrder(order.id), "מחיקת הזמנה", "האם אתה בטוח שברצונך למחוק הזמנה זו? (לא תוכל לשחזר)")}>מחיקת הזמנה</Button>
             <Button onClick={() => openConfirmModal(() => moveToOld(order.id), "העברה לתקיה של הזמנות ישנות", "האם אתה בטוח שברצונך להעביר הזמנה זו לתיקיית הזמנות ישנות? (לא תוכל להחזיר)")}>העברה לתיקיית הזמנות ישנות</Button>
 
+            {
+              // if the order is late, place notify button
+              new Date(order.endDate) < new Date()? (
+                <>
+                  <Button
+                    id={"notify-"+order.id}
+                    type="checkbox"
+                    onClick={handleNotifyCreator(order)}
+                  >
+                    שלח הודעה
+                  </Button>
+                </>
+              ):(
+                null
+              )
+            }
+
           </div>
         ))}
         
@@ -357,6 +396,17 @@ const ManageOrders = () => {
         title={modalTitle}
         body={modalBody}
       />
+
+      { /** Confirm email sending */}
+      <Modal show={showEmailSentModal} onHide={() => setShowEmailSentModal(false)}>
+        <Modal.Body>The email has been sent successfully!</Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={() => setShowEmailSentModal(false)}>
+            OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
     </div>
   );
 };

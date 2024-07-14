@@ -9,6 +9,8 @@ import Modal from "../../components/Modal/Modal";
 import { useCombined } from "../../context/CombinedContext";
 import "./cart.css";
 
+import {notifiySuccessfullOrder} from "../../utils/emailSender";
+
 export const Cart = () => {
   const {
     products,
@@ -87,6 +89,10 @@ export const Cart = () => {
       dispatch(clearCart());
       handleResetDates();
       navigate("/");
+
+      // Send email
+      notifiySuccessfullOrder(userInfo, selectedProducts, startDate, endDate);
+
     } catch (error) {
       console.error("Error creating order: ", error);
       alert('Failed to create order. Please try again.');
