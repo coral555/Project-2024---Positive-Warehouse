@@ -3,6 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { IoCartOutline, IoCallOutline, IoCardOutline, IoLogInOutline, IoHomeOutline } from "react-icons/io5";
 import "./navbar.css";
 import { useSelector } from "react-redux";
+import logo from "../../assets/svg/logo.svg";
 
 export const Navbar = () => {
   const cartItems = useSelector((state) => state.cart);
@@ -19,15 +20,16 @@ export const Navbar = () => {
         <NavLink to="/loginPage" className={isActive("/loginPage")}>
           <IoLogInOutline size={30} style={isActive("/loginPage") ? { color: "#33e900" } : {}} />
         </NavLink>
-      </div>
-      <div className="middle-left">
         <NavLink to="/cart" className={`cart-link ${isActive("/cart")}`}>
           <IoCartOutline size={30} style={isActive("/cart") ? { color: "#33e900" } : {}} />
-          {Object.keys(cartItems).length > 0 && orderPlaced && (
+          {Object.keys(cartItems).length > 0 && !orderPlaced && (
             <span className="cart-notification" />
           )}
         </NavLink> 
       </div>
+      <NavLink exact="true" to="/" className="logo-container">
+        <img src={logo} alt="logo Img" className="navbar-logo" />
+      </NavLink>
       <div className="links">
         <NavLink to="/AboutWarehouse" className={isActive("/AboutWarehouse")}>
           מי אנחנו

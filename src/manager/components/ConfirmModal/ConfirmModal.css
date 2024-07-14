@@ -1,8 +1,35 @@
-/* Add this to your CSS file or inside a <style> tag in your HTML file */
 .custom-modal .modal-dialog {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-  
+  position: absolute;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.modal-title-123{
+  text-align: center;
+}
+.modal-body-123{
+  text-align: right;
+}
+.modal-footer-123{
+  margin-left: 30%;
+}
+.modal-footer-cancel-123{
+  background-color: #b10000;
+  border-color: #b10000;
+  color: white;
+  margin-right: 10px;
+}
+.modal-footer-cancel-123:hover{
+  background-color: #ee0303;
+  border-color: #ee0303;
+}
+.modal-footer-conform-123{
+  background-color: #115e00;
+  border-color: #115e00;
+  color: white;
+}
+.modal-footer-conform-123:hover{
+  background-color: #1b8d02;
+  border-color:#1b8d02;
+}

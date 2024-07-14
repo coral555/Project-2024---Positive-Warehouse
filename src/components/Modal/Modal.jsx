@@ -1,4 +1,3 @@
-// src/components/Modal.jsx
 import React from 'react';
 import './Modal.css';
 
@@ -12,7 +11,7 @@ const Modal = ({ isOpen, onClose, onSubmit, userInfo, setUserInfo }) => {
   };
 
   if (!isOpen) {
-    return null; // Don't render anything if the modal is not open
+    return null; 
   }
 
   return (

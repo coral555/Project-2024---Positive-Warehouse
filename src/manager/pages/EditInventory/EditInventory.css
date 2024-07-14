@@ -1,60 +1,93 @@
-/* Global styles to apply background to entire page */
+/* Global styles */
 body {
-    background-color: #f5f5f5; /* Replace with your desired background color */
+    background-color:  #e6e8e6 !important; 
 }
 
 html {
-    height: 100%; /* Ensure full height of the viewport is covered */
-    width: 100%; /* Ensure full height of the viewport is covered */
-
+    height: 100%;
+    width: 100%;
 }
 
-/* EditInventory component specific styles */
-.edit-inventory-container {
+.modal-buttons1 {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; 
+}
+
+.modal-buttons1 button {
+    flex: 1; 
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.modal-buttons1 button:first-child {
+    background-color: #c82333; 
+    
+}
+.modal-buttons1 button:first-child:hover {
+    background-color: #a71d2a;
+}
+.modal-buttons1 button:last-child {
+    background-color: #115e00;
+}
+.modal-buttons1 button:last-child:hover {
+    background-color: #188300;
+}
+.modal-input1{
+    text-align: right;
+    
+}
+
+.edit-inventory-container1 {
+    
     padding: 80px;
-    max-width: 110%; /* Set maximum width to 100% */
+    max-width: 110%;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     position: relative;
-    background-color: #f5f5f5; /* Set the same background color as body for consistency */
-    direction: rtl; /* Set text direction to right-to-left */
+    background-color: #e6e8e6;
+    direction: rtl;
 }
 
-.edit-inventory-container h2 {
+.edit-inventory-container1 h2 {
     text-align: center;
-    color: #005806;
+    color: #115e00;
     margin-bottom: 20px;
+    font-size: 1.5rem;
 }
 
-.edit-inventory-container .search-container select,
-.edit-inventory-container .search-container input {
+.edit-inventory-container1 .search-container1 select,
+.edit-inventory-container1 .search-container1 input {
     padding: 8px;
     margin: 9px;
     border: 1px solid #605e5e;
     border-radius: 120px 10px 200px 10px;
-    width: 48%;
-    
+    width: 20%;
 }
 
-.edit-inventory-container .products-container {
+.edit-inventory-container1 .products-container1 {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
 }
 
-.edit-inventory-container .product-item {
+.edit-inventory-container1 .product-item1 {
     border-radius: 10px;
-    background-color: rgb(246, 249, 247); /* Example background color */
+    background-color: rgb(246, 249, 247);
     padding: 10px;
     margin: 10px;
-    width: calc(25% - 20px); /* Adjust width to fit 3 items per row */
+    width: calc(25% - 20px);
     text-align: center;
     position: relative;
     box-sizing: border-box;
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
-    direction: rtl; /* Set text direction to right-to-left */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    direction: rtl;
 }
 
-.edit-inventory-container .product-item img {
+.edit-inventory-container1 .product-item1 img {
     width: 100%;
     height: 200px;
     object-fit: cover;
@@ -62,7 +95,7 @@ html {
     margin-bottom: 5px;
 }
 
-.edit-inventory-container .product-item .no-image {
+.edit-inventory-container1 .product-item1 .no-image {
     width: 100px;
     height: 100px;
     display: flex;
@@ -72,78 +105,85 @@ html {
     margin-bottom: 10px;
 }
 
-.edit-inventory-container .product-detail {
+.edit-inventory-container1 .product-item1 .product-detail1 {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 3px;
-    padding: 10px 0; /* Adjust vertical padding */
+    padding: 10px 0;
 }
 
-.edit-inventory-container .product-detail span {
-    flex: 1.5; /* Adjusted flex size to make fields smaller */
+.edit-inventory-container1 .product-item1 .product-detail1 span {
+    flex: 1.5;
     margin-right: -80px;
     cursor: pointer;
 }
 
-.edit-inventory-container .product-detail input {
-    flex: 1.5; /* Adjusted flex size to make fields smaller */
+.edit-inventory-container1 .product-item1 .product-detail1 input {
+    flex: 1.5;
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 5px;
     margin-right: 5px;
 }
 
-
-.edit-inventory-container .product-item button {
-    flex: 1; /* Take up remaining space */
+.edit-inventory-container1 .product-item1 button {
+    flex: 1;
     padding: 5px;
-    background-color: rgb(2, 60, 21);
+    background-color: #115e00;
     border: none;
     border-radius: 8px;
     color: #fff;
     font-size: 14px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin: 5px;
 }
 
-.edit-inventory-container .product-item button:hover {
-    background-color: #406241;
+.edit-inventory-container1 .product-item1 button:hover {
+    background-color: #1a8d00;
 }
 
-.edit-inventory-container .product-item button:last-child {
+.edit-inventory-container1 .product-item1 button:last-child {
     width: 90%;
     left: 56%;
 }
 
-.edit-inventory-container .product-item:hover {
-    transform: translateY(-5px); /* Lift the block up by 5px on hover */
+.edit-inventory-container1 .product-item1:hover {
+    transform: translateY(-5px);
 }
 
-.load-more-button {
+.load-more-button1 {
     padding: 10px 20px;
     cursor: pointer;
+    margin-right: 45%;
+    background-color: #115e00;
+    border: #115e00;
+    color: #fff;
 }
 
-.no-products {
-    margin-top: 20px;
+.no-products1 {
+    margin-top: 20px; 
     text-align: center;
+}
+.conform-delete1{
+    text-align: right;
 }
 
 /* Modal styles */
-.small-modal {
+.small-modal1 {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 300px;
-    padding: 10px;
+    padding: 10px; 
     border: 1px solid #ccc;
     background: #fff;
     border-radius: 10px;
     outline: none;
 }
 
-.small-modal-overlay {
+.small-modal-overlay1 {
     background: rgba(0, 0, 0, 0.75);
 }

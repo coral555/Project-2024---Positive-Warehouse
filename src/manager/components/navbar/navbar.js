@@ -41,12 +41,11 @@ export const NavbarManger = () => {
     >
       <Link to="/EditInventory">ערוך מלאי</Link>
       <Link to="/AddNewProduct">הוספת מוצר חדש</Link>
+      <Link to="/ManageCategories">עריכת קטגוריות</Link> 
+      <Link to="/ManageOrders">ניהול הזמנות</Link>
       <Link to="/Reports">דוחות</Link>
-      <Link to="/ManageOrders">ניהול הזמנות</Link> 
-      <Link to="/ManageCategories">ניהול ת</Link> 
-
     </div>
   );
 };
 
-export default NavbarManger;
+export default NavbarManger;

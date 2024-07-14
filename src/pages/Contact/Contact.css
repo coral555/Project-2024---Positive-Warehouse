@@ -1,27 +1,40 @@
+.contact-page{
+    margin-bottom:10px ;
+
+}
+
+
 h2{
     direction: rtl;
-    font-size: 40;
+    font-size: 0;
     font-family: 'Times New Roman', Times, serif;
+    
 }
 
 h4{
-    margin-left: 600px; 
+    margin-left: 550px; 
+    
     font-size: 35;
     font-family: 'Times New Roman', Times, serif;
 }
 
 .contact-page {
+    
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: 10vh;
-    padding: 50px;
+    min-height: 5vh;
+    padding: 10px;
     background-color: #E6E8E6;
 }
 
 .page-title {
     font-size: 40px;
+    margin-left: 300px;
+    
+    justify-content: center;
+    align-items: center;
     font-family: 'Times New Roman', Times, serif;
 }
 
@@ -34,11 +47,12 @@ h4{
 
 .contact-form-container {
     display: flex;
+    margin-top: 100px;
     background-color: #E6E8E6;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(2, 138, 47, 0.343);
-    width: 80%;
-    max-width: 1200px;
+    width: 100%;
+    max-width:900px;
     overflow: hidden;
 }
 
@@ -54,14 +68,14 @@ h4{
 
 .text-wrapper {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
 .text-one {
     font-size: 35px;
     color: black;
     font-weight: bold; 
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     font-family: 'Times New Roman', Times, serif;
 }
 
@@ -75,11 +89,49 @@ h4{
 
 .contact-email {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 50px;
 
 }
 
 .contact-section {
     flex: 2;
     padding: 10px;
+}
+
+.phone-icon {
+    color: #2E8B57; 
+    margin-left: 10px;
+    direction: rtl;
+    font-size: 30px;
+    
+}
+
+.contact-form-container {
+    display: flex;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(2, 138, 47, 0.343);
+    width: 100%;
+    max-width: 1200px;
+    overflow: hidden;
+    position: relative; /* Ensure positioning context for the pseudo-element */
+    z-index: 1; /* Ensure content appears above the background */
+}
+
+/* Pseudo-element for the background image */
+.contact-form-container::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 500px; /* Adjust the width to make the image smaller */
+    height: 200px; /* Adjust the height to make the image smaller */
+    background-image: url('../../assets/images/logo.jpg');
+    background-size: contain; /* Ensure the whole image is visible */
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.3; /* Adjust the transparency level here */
+    transform: translate(-20%, -50%) rotate(-30deg); /* Center and rotate the image */
+    z-index: -1; /* Place the image behind the content */
+    filter: brightness(0.5); /* Adjust brightness to control the image strength */
 }

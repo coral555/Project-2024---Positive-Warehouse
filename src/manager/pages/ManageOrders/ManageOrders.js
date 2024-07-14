@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useCombined } from "../../../context/CombinedContext";
 import "./ManageOrders.css";
-import { Button, Modal, Form } from 'react-bootstrap';
+import { Button,Modal, Form } from 'react-bootstrap';
 import { deleteDoc, doc, updateDoc, query, collection, where, getDocs, getDoc, addDoc, Timestamp } from 'firebase/firestore';
 import { db } from "../../../utils/firebase";
 import { selectfetchProducts, addProductToOrder } from "../../../utils/firebaseUtils";
-import OrderFieldEditor from '../../components/OrderFieldEditor/OrderFieldEditor'; // Adjust the path as per your file structure
+import OrderFieldEditor from '../../components/OrderFieldEditor/OrderFieldEditor'; 
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'; 
+// import confirmModalOrders from '../../components/confirmModelOrders/'; 
 
 import {notifiyLateOrder} from '../../../utils/emailSender';
 
@@ -32,31 +33,24 @@ const ManageOrders = () => {
     productName: "",
     selectedQuantity: 1
   });
-
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedSubCategory, setSelectedSubCategory] = useState('');
-  const [editedFields, setEditedFields] = useState({});
-  const [selectedProductQuantity, setSelectedProductQuantity] = useState(null);
-
   const [showEmailSentModal, setShowEmailSentModal] = useState(false);
-
   const handleNotifyCreator = function(order) {
     return (target) => {
-
-      const endDate = new Date(order.endDate); // Ensure endDate is a Date object
+      const endDate = new Date(order.endDate);
       const currentDate = new Date();
       const day_since_return_date = Math.floor((currentDate - endDate) / (1000 * 60 * 60 * 24));
-
       notifiyLateOrder({
         name:  order.user.name,
         email: order.user.email,
         days_since_return_date: day_since_return_date
       }, order.products);
-
-      setShowEmailSentModal(true); // Show the "Email Sent" modal
-
+      setShowEmailSentModal(true); 
     }
   }
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedSubCategory, setSelectedSubCategory] = useState('');
+  const [editedFields, setEditedFields] = useState({});
+  const [selectedProductQuantity, setSelectedProductQuantity] = useState(null);
 
   const formatTimestamp = (timestamp) => {
     if (!timestamp || !(timestamp instanceof Date)) return '';
@@ -222,10 +216,15 @@ const ManageOrders = () => {
   };
 
   const handleFetchOldOrders = async () => {
-    const now = new Date();
-    const oldDateTimestamp = Timestamp.fromDate(now);
-    setSearchTerm('');
-    await searchOrders({ userEmail: "", userName: "", userPhone: "" }, oldDateTimestamp);
+    try{
+      const now = new Date();
+      const oldDateTimestamp = Timestamp.fromDate(now);
+      setSearchTerm('');
+      await searchOrders({ userEmail: "", userName: "", userPhone: "" }, oldDateTimestamp);
+    } catch (error) {
+      console.error('Error fetching old orders:', error);
+      // await searchOrders(searchParams);
+    }
   };
 
   const openConfirmModal = (action, title, body) => {
@@ -241,18 +240,18 @@ const ManageOrders = () => {
     <div className="manage-orders">
       <h2 className="title">ניהול הזמנות</h2>
       <div className="search-form">
-        <input
+        <input id="text-input"
           type="text"
           placeholder="חפש לפי מייל, שם או מספר נייד"
           onChange={handleSearchChange}
         />
-        <button onClick={handleSearch}>חיפוש</button>
-        <button onClick={handleFetchOldOrders}>הזמנות ישנות</button>
+        <Button className="custom-button-search" onClick={handleSearch}>חיפוש</Button>
+        <Button className="custom-button-search" onClick={handleFetchOldOrders}>הזמנות ישנות</Button>
       </div>
       <div className="orders-list">
         {orders.map((order) => (
           <div key={order.id} className="order">
-            <h3>Order ID: {order.id}</h3>
+            <h3>{order.id} :מספר הזמנה</h3>
             <div className="order-details">
               <OrderFieldEditor
                 orderId={order.id}
@@ -273,7 +272,7 @@ const ManageOrders = () => {
                 handleEditField={handleEditField}
               />
 
-              <strong>פרטי הלקוח:</strong> <br />
+              <strong className="align-right">:פרטי הלקוח</strong> <br />
               <OrderFieldEditor
                 orderId={order.id}
                 fieldName="email"
@@ -293,98 +292,93 @@ const ManageOrders = () => {
                 handleEditField={(id, field, value) => handleEditUserField(id, 'phone', value)}
               />
             </div>
-            <strong>מוצרים שהלקוח הזמין:</strong>
-            <ul>
+            <strong className="align-right">:מוצרים שהלקוח הזמין</strong>
+            <ul className="align-right">
               {order.products.map((product) => (
                 <li key={product.id}>
-                  <p>Product ID: {product.id}</p>
-                  <p>{product.productName}</p>
+                  <p>{product.id} :מספר הזמנה</p>
+                  <p>שם המוצר: {product.productName}</p>
                   <p>כמות: {product.selectedQuantity}</p>
-                  <Button onClick={() => handleEditProduct(order.id, product.id, 'selectedQuantity', product.selectedQuantity + 1)}>הגדלת הכמות</Button>
-                  <Button onClick={() => {
+                  <Button className="custom-button" onClick={() => handleEditProduct(order.id, product.id, 'selectedQuantity', product.selectedQuantity + 1)}>הגדלת הכמות</Button>
+                  <Button className="custom-button" onClick={() => {
                     if (product.selectedQuantity > 1) {
                       handleEditProduct(order.id, product.id, 'selectedQuantity', product.selectedQuantity - 1);
                     }
                   }}>הורדת הכמות</Button>
-                  <Button onClick={() => handleDeleteProduct(order.id, product.id)}>מחיקת מוצר</Button>
+                  <Button className="custom-button" onClick={() => handleDeleteProduct(order.id, product.id)}>מחיקת מוצר</Button>
                 </li>
               ))}
             </ul>
-            <strong>הוספת מוצרים להזמנה זו:</strong>
-            <Form.Group controlId="categorySelect">
-              <Form.Label>בחר קטגוריה </Form.Label>
-              <Form.Control as="select" value={selectedCategory} onChange={handleCategoryChange}>
-                <option value="">כל הקטגוריות</option>
-                {categories.map(category => (
-                  <option key={category.id} value={category.name}>
-                    {category.name}
-                  </option>
-                ))}
-              </Form.Control>
+            <strong className="align-right">:הוספת מוצרים להזמנה זו</strong>
+            <Form.Group className="align-right-product" controlId="categorySelect">
+                <Form.Control className="align-right-product" as="select" value={selectedCategory} onChange={handleCategoryChange}>
+                    <option className="align-right-product" value="">כל הקטגוריות</option>
+                    {categories.map(category => (
+                        <option key={category.id} value={category.name}>
+                            {category.name}
+                        </option>
+                    ))}
+                </Form.Control>
+                <Form.Label className="align-right-product"> בחר קטגוריה</Form.Label>
             </Form.Group>
             <p>
-            <Form.Group controlId="subCategorySelect">
-              <Form.Label>בחר תת קטגוריה </Form.Label>
-              <Form.Control as="select" value={selectedSubCategory} onChange={handleSubCategoryChange} disabled={!selectedCategory}>
-                <option value="">כל תתי הקטגוריות</option>
-                {subCategories.map((subCat, index) => (
-                  <option key={index} value={subCat}>
-                    {subCat}
-                  </option>
-                ))}
-              </Form.Control>
-            </Form.Group>
+                <Form.Group className="align-right-product" controlId="subCategorySelect">
+                    <Form.Control className="align-right-product" as="select" value={selectedSubCategory} onChange={handleSubCategoryChange} disabled={!selectedCategory}>
+                        <option className="align-right-product" value="">כל תתי הקטגוריות</option>
+                        {subCategories.map((subCat, index) => (
+                            <option key={index} value={subCat}>
+                                {subCat}
+                            </option>
+                        ))}
+                    </Form.Control>
+                    <Form.Label className="align-right-product"> בחר תת קטגוריה</Form.Label>
+                </Form.Group>
             </p>
             <p>
-            <Form.Group controlId="productSelect">
-              <Form.Label>בחר מוצר </Form.Label>
-              <Form.Control as="select" value={newProduct.id} onChange={handleProductChange}>
-                <option value="">שם המוצר</option>
-                {products.map(product => (
-                  <option key={product.id} value={product.id}>
-                    {product.name} (הכמות במלאי: {product.quantity})
-                  </option>
-                ))}
-              </Form.Control>
-              {selectedProductQuantity !== null && (
-                <p>הכמות במלאי: {selectedProductQuantity}</p>
-              )}
-            </Form.Group>
+                <Form.Group className="align-right-product" controlId="productSelect">
+                    <Form.Control className="align-right-product" as="select" value={newProduct.id} onChange={handleProductChange}>
+                        <option className="align-right-product" value="">שם המוצר</option>
+                        {products.map(product => (
+                            <option key={product.id} value={product.id}>
+                                {product.name} (הכמות במלאי: {product.quantity})
+                            </option>
+                        ))}
+                    </Form.Control>
+                    {selectedProductQuantity !== null && (
+                        <p className="align-right-product">הכמות במלאי: {selectedProductQuantity}</p>
+                    )}
+                    <Form.Label className="align-right-product"> בחר מוצר</Form.Label>
+                </Form.Group>
             </p>
             <p>
-            <Form.Group controlId="quantityInput">
-              <Form.Label>בחר כמות </Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Quantity"
-                value={newProduct.selectedQuantity}
-                onChange={(e) => setNewProduct({ ...newProduct, selectedQuantity: Math.min(parseInt(e.target.value), selectedProductQuantity) })}
-              />
-            </Form.Group>
+                <Form.Group className="align-right-product" controlId="quantityInput">
+                    <Form.Control
+                        className="align-right-product"
+                        type="number"
+                        placeholder="Quantity"
+                        value={newProduct.selectedQuantity}
+                        onChange={(e) => setNewProduct({ ...newProduct, selectedQuantity: Math.min(parseInt(e.target.value), selectedProductQuantity) })}
+                    />
+                    <Form.Label className="align-right-product"> בחר כמות</Form.Label>
+                </Form.Group>
             </p>
-            <Button
-              onClick={() => handleAddProduct(order.id)}
-              disabled={newProduct.selectedQuantity > selectedProductQuantity}>הוספת המוצר</Button>
-            <Button onClick={() => openConfirmModal(() => handleDeleteOrder(order.id), "מחיקת הזמנה", "האם אתה בטוח שברצונך למחוק הזמנה זו? (לא תוכל לשחזר)")}>מחיקת הזמנה</Button>
-            <Button onClick={() => openConfirmModal(() => moveToOld(order.id), "העברה לתקיה של הזמנות ישנות", "האם אתה בטוח שברצונך להעביר הזמנה זו לתיקיית הזמנות ישנות? (לא תוכל להחזיר)")}>העברה לתיקיית הזמנות ישנות</Button>
-
-            {
-              // if the order is late, place notify button
-              new Date(order.endDate) < new Date()? (
+            <p className="align-right-product">
+              {new Date(order.endDate) < new Date()? (
                 <>
-                  <Button
+                  <Button className="custom-button"
                     id={"notify-"+order.id}
                     type="checkbox"
                     onClick={handleNotifyCreator(order)}
-                  >
-                    שלח הודעה
-                  </Button>
-                </>
-              ):(
-                null
-              )
-            }
-
+                  >שלח תזכורת</Button>
+                </>):(null)}
+              <Button className="custom-button-delete"
+                  onClick={() => openConfirmModal(() => handleDeleteOrder(order.id), "מחיקת הזמנה", "האם אתה בטוח שברצונך למחוק הזמנה זו? (לא תוכל לשחזר)")}>מחיקת הזמנה</Button>
+              <Button className="custom-button"
+                  onClick={() => handleAddProduct(order.id)}
+                  disabled={newProduct.selectedQuantity > selectedProductQuantity}>הוספת המוצר</Button>
+              <Button className="custom-button"
+                  onClick={() => openConfirmModal(() => moveToOld(order.id), "העברה לתקיה של הזמנות ישנות", "האם אתה בטוח שברצונך להעביר הזמנה זו לתיקיית הזמנות ישנות? (לא תוכל להחזיר)")}>העברה לתיקיית הזמנות ישנות</Button>
+                </p>
           </div>
         ))}
         
@@ -396,19 +390,17 @@ const ManageOrders = () => {
         title={modalTitle}
         body={modalBody}
       />
-
-      { /** Confirm email sending */}
+          { /** Confirm email sending */}
       <Modal show={showEmailSentModal} onHide={() => setShowEmailSentModal(false)}>
         <Modal.Body>The email has been sent successfully!</Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={() => setShowEmailSentModal(false)}>
-            OK
+            אישור
           </Button>
         </Modal.Footer>
       </Modal>
-
     </div>
   );
 };
 
-export default ManageOrders;
+export default ManageOrders;

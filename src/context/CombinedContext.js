@@ -1,8 +1,8 @@
-//src\context\CombinedContext.js
 import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
-import { fetchProducts, fetchCategories, fetchOrders,fetchOrdersWithConditions } from '../utils/firebaseUtils';
+import { fetchProducts, fetchCategories, fetchOrders, fetchOrdersWithConditions } from '../utils/firebaseUtils';
 
 const CombinedContext = createContext();
+
 const fetchData = async (fetchFunction, setLoading, setError, setData) => {
   setLoading(true); 
   setError(null);
@@ -39,7 +39,7 @@ export const CombinedProvider = ({ children }) => {
   const [category, setCategory] = useState('');
   const [subCategory, setSubCategory] = useState(''); 
   const [subCategories, setSubCategories] = useState([]);
-
+  const [sortBy, setSortBy] = useState(''); 
 
   const fetchInitialCategories = useCallback(() => {
     fetchData(fetchCategories, setLoading, setError, setCategories);
@@ -56,16 +56,15 @@ export const CombinedProvider = ({ children }) => {
     clearQuantities();
     clearCart();
   };
-  const fetchInitialProducts = useCallback(() => {
 
+  const fetchInitialProducts = useCallback(() => {
     setLoading(true);
     setError(null);
-    fetchProducts(5, null, category, subCategory)
+    fetchProducts(10, null, category, subCategory, sortBy)
       .then(({ productList, lastVisible }) => {
         setProducts(productList);
         setLastVisible(lastVisible);
         setIsFetchingAll(true);
-
       })
       .catch((error) => {
         console.error("Error fetching products:", error);
@@ -74,16 +73,13 @@ export const CombinedProvider = ({ children }) => {
       .finally(() => {
         setLoading(false);
       });
-  }, [category, subCategory]);
+  }, [category, subCategory, sortBy]);  // Added sortBy to dependencies
 
   const fetchMoreProducts = async () => {
-    console.log(products);
-
     if (!lastVisible || isFetchingMore) return;
-      setIsFetchingMore(true);
+    setIsFetchingMore(true);
     try {
-
-      const { productList, lastVisible: newLastVisible } = await fetchProducts(5, lastVisible, category, subCategory);
+      const { productList, lastVisible: newLastVisible } = await fetchProducts(10, lastVisible, category, subCategory, sortBy);
       if (productList.length === 0) {
         setIsFetchingAll(false);
       }
@@ -113,12 +109,10 @@ export const CombinedProvider = ({ children }) => {
       const selectedCategory = categories.find(cat => cat.name === category);
       if (selectedCategory && selectedCategory.subCategory) {
         setSubCategories(selectedCategory.subCategory);
-      } 
-      else {
+      } else {
         setSubCategories([]);
       }
-    } 
-    else {
+    } else {
       setSubCategories([]);
     }
   }, [category, categories]);
@@ -173,6 +167,7 @@ export const CombinedProvider = ({ children }) => {
     },
     [productQuantities]
   );
+
   const clearQuantities = () => {
     setProductQuantities({});
   };
@@ -180,10 +175,12 @@ export const CombinedProvider = ({ children }) => {
   const clearCart = () => {
     setProductQuantities({});
   };
+
   const searchOrders = async (searchParams, olddate = null) => {
     const fetchedOrders = await fetchOrdersWithConditions(searchParams, olddate);
     setOrders(fetchedOrders);
   };
+
   return (
     <CombinedContext.Provider
       value={{
@@ -219,8 +216,11 @@ export const CombinedProvider = ({ children }) => {
         subCategories,
         setSubCategories,
         isFetchingAll,
-        searchOrders ,
+        searchOrders,
         clearQuantities,
+        sortBy,        // Added sortBy to the context
+        setSortBy,     // Added setSortBy to the context
+        setCategoriesFetched,
       }}
     >
       {children}

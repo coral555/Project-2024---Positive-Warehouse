@@ -11,7 +11,7 @@ body-category-management {
     font-family: Arial, sans-serif;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     margin: auto;
-    margin-top: 10%;
+    margin-top: 5%;
 }
 
 .category-management:hover {
@@ -21,7 +21,7 @@ body-category-management {
 
 .category-management h3 {
     text-align: center;
-    color: rgb(2, 60, 21);
+    color: #115e00;
     /* margin-bottom: 10px; */
     font-size: 20px;
 }
@@ -43,9 +43,9 @@ body-category-management {
 .category-management select:focus,
 .category-management input:focus,
 .category-management textarea:focus { /* Include textarea if needed */
-    border-color: rgb(2, 60, 21);
+    border-color: #115e00;
     outline: none;
-    box-shadow: 0 0 5px rgba(2, 60, 21, 0.3);
+    box-shadow: 0 0 5px #115e00;
 }
 
 .category-management input[type="file"] {
@@ -54,20 +54,20 @@ body-category-management {
 
 .category-management button {
     width: 50%;
-    padding: 8px;
-    background-color: rgb(10, 98, 40);
+    padding: 5px;
+    background-color: #115e00;
     border: none;
     border-radius: 5px;
     color: white;
     font-size: 14px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    margin-left: 25%; /* Center align the button */
+    margin-left: 25%; 
     margin-bottom: 20px;
 }
 
 .category-management button:hover {
-    background-color: rgb(57, 123, 73);
+    background-color: #177d00;
 }
 
 .manage-categories-container {

@@ -2,19 +2,18 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { CartItem } from "../../components/cart-item/cart-item";
 import { useNavigate, useLocation } from "react-router-dom";
-import { PlaceOrder, clearCart } from "../../actions/cartActions"; // Ensure clearCart action is imported
-import { addDoc, collection, Timestamp } from "firebase/firestore"; // Ensure Timestamp is imported
+import { PlaceOrder, clearCart } from "../../actions/cartActions";
+import { addDoc, collection, Timestamp } from "firebase/firestore";
 import { db } from "../../utils/firebase";
 import Modal from "../../components/Modal/Modal";
 import { useCombined } from "../../context/CombinedContext";
 import "./cart.css";
 
 import {notifiySuccessfullOrder} from "../../utils/emailSender";
-
 export const Cart = () => {
   const {
     products,
-    isModalOpen, 
+    isModalOpen,
     setIsModalOpen,
     startDate,
     endDate,
@@ -26,6 +25,9 @@ export const Cart = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [userInfo, setUserInfo] = useState({ name: "", email: "", phone: "" });
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState(""); // 'success' or 'error'
+  const [successMessage, setSuccessMessage] = useState(""); // Separate state for success message
 
   const { startDate: selectedStartDate, endDate: selectedEndDate } = location.state || {};
 
@@ -41,12 +43,23 @@ export const Cart = () => {
 
   const handleCheckout = async () => {
     if (!validateEmail(userInfo.email)) {
-      alert("Please enter a valid email address.");
+
+      setAlertMessage("Please enter a valid email address.");
+      setAlertType("error");
+      setTimeout(() => {
+        setAlertMessage("");
+        setAlertType("");
+      }, 1000);
       return;
     }
 
     if (!validatePhoneNumber(userInfo.phone)) {
-      alert("Please enter a valid phone number.");
+      setAlertMessage("Please enter a valid phone number.");
+      setAlertType("error");
+      setTimeout(() => {
+        setAlertMessage("");
+        setAlertType("");
+      }, 1000);
       return;
     }
 
@@ -64,7 +77,7 @@ export const Cart = () => {
       });
 
     const currentDate = new Date();
-    const orderDate = Timestamp.fromDate(currentDate); 
+    const orderDate = Timestamp.fromDate(currentDate);
 
     const startTimestamp = selectedStartDate ? Timestamp.fromDate(new Date(selectedStartDate)) : Timestamp.fromDate(new Date(startDate));
     const endTimestamp = selectedEndDate ? Timestamp.fromDate(new Date(selectedEndDate)) : Timestamp.fromDate(new Date(endDate));
@@ -84,18 +97,25 @@ export const Cart = () => {
 
       const ordersCollectionRef = collection(db, "orders");
       await addDoc(ordersCollectionRef, orderData);
-      alert('Order created successfully!');
+      setSuccessMessage('Order created successfully!');
+      notifiySuccessfullOrder(userInfo, selectedProducts, startDate, endDate);
+      setAlertMessage("");
+      setAlertType("");
       dispatch(PlaceOrder(orderData));
       dispatch(clearCart());
       handleResetDates();
-      navigate("/");
-
-      // Send email
-      notifiySuccessfullOrder(userInfo, selectedProducts, startDate, endDate);
-
-    } catch (error) {
+      setTimeout(() => {
+        setSuccessMessage("");
+        navigate("/");
+      }, 1000); 
+    } catch (error) { 
       console.error("Error creating order: ", error);
-      alert('Failed to create order. Please try again.');
+      setAlertMessage('Failed to create order. Please try again.');
+      setAlertType("error");
+      setTimeout(() => {
+        setAlertMessage("");
+        setAlertType("");
+      }, 1000);
     }
   };
 
@@ -112,7 +132,7 @@ export const Cart = () => {
     setIsModalOpen(false);
   };
 
-  return ( 
+  return (
     <div className="cart">
       <div>
         <h1>Your Cart Items</h1>
@@ -127,7 +147,7 @@ export const Cart = () => {
 
       {Object.keys(cartItems).length > 0 ? (
         <div className="checkout">
-          <button onClick={() => navigate(-1)}> Continue Shopping </button>
+          <button onClick={() => navigate(-1)}> Back </button>
           <button onClick={handlePlaceOrderClick}> Place Order </button>
         </div>
       ) : (
@@ -141,6 +161,18 @@ export const Cart = () => {
         userInfo={userInfo}
         setUserInfo={setUserInfo}
       />
+
+      {alertMessage && (
+        <div className={`alert ${alertType}`}>
+          {alertMessage}
+        </div>
+      )}
+
+      {successMessage && (
+        <div className="alert success">
+          {successMessage}
+        </div>
+      )}
     </div>
   );
 };

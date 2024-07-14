@@ -186,7 +186,6 @@ const ManageCategories = () => {
                     onChange={(e) => setNewCategory(e.target.value)}
                 />
                 <button onClick={handleAddCategory}>הוספת קטגוריה</button>
-
                 <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
                     <option value="">בחר קטגוריה להסרה</option>
                     {categories.map((category) => (
