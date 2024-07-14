@@ -1,4 +1,5 @@
 import "./Reports.css";
+import Statistics from "./Statistics";
 import React, { useState, useEffect } from "react";
 import { fetchCollection } from "../../../utils/firebaseUtils";
 import 'firebase/firestore';
@@ -15,7 +16,6 @@ const Reports = () => {
 
     // Selects to display different reports
     const [showOrders, setShowOrders] = useState(false);
-    const [showPopularProducts, setShowPopularProducts] = useState(false);
     const [showcategories, setShowCategories] = useState(false);
     const [showProducts, setShowProducts] = useState(false);
     const [showNoReports, setShowNoReports] = useState(false);
@@ -26,7 +26,6 @@ const Reports = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
-    const [mostPopular, setMostPopular] = useState([]);
 
     const [ordersToDisplay, setOrdersToDisplay] = useState([]);
 
@@ -57,16 +56,14 @@ const Reports = () => {
         const fetchReports = async () => {
             console.log('Fetching reports...');
             const oldOrders = await fetchCollection('oldOrders');
-            const orders = await fetchCollection('orders');
-            const products = await fetchCollection('products');
-            const categories = await fetchCollection('קטגוריות');
+            // const products = await fetchCollection('products');
+            // const categories = await fetchCollection('קטגוריות');
             
-            setCategories(categories);
-            setProducts(products);
+            // setCategories(categories);
+            // setProducts(products);
 
-            const ordersTotal = oldOrders.concat(orders);
-            setDisplayOrders(true);
-            setAllOrders(ordersTotal);
+            // setDisplayOrders(true);
+            setAllOrders(oldOrders);
         };
 
         fetchReports();
@@ -83,7 +80,6 @@ const Reports = () => {
 
     const resetReportsDisplay = () => {
         setShowOrders(false);
-        setShowPopularProducts(false);
         setShowNoReports(false);
         setShowProducts(false);
         setShowCategories(false);
@@ -240,7 +236,6 @@ const Reports = () => {
 
     const handleFilterOrders = async () => {
         const oldOrders = allOrders;
-        setShowPopularProducts(false);
 
         var newReports = oldOrders;
 
@@ -264,35 +259,6 @@ const Reports = () => {
         setShowOrders(true);
         setOrdersToDisplay(newReports);
         checkIfNoReportsToDisplay(newReports)
-    };
-
-    // Counnting and sorting each products in every order to display most popular
-    const countAndSortProducts = (orders) => {
-        const productCount = {};
-    
-        orders.forEach(order => {
-            order.products.forEach(product => {
-                const productName = product.productName;
-                if (productCount[productName]) {
-                    productCount[productName] += product.selectedQuantity;
-                } else {
-                    productCount[productName] = product.selectedQuantity;
-                }
-            });
-        });
-    
-        const sortedProducts = Object.entries(productCount).sort((a, b) => b[1] - a[1]);
-    
-        return sortedProducts;
-    };
-
-    // Function to display most popular products
-    const handleShowMostPopular = async () => {
-        const oldOrders = allOrders;
-        resetReportsDisplay();
-        setShowPopularProducts(true);
-        const mostPopularProducts = countAndSortProducts(oldOrders);
-        setMostPopular(mostPopularProducts);
     };
 
     // Function to check if two dates overlap
@@ -321,6 +287,10 @@ const Reports = () => {
     return (
         <div className="reports-container">
             <h1>דוחות</h1>
+
+            <Statistics allOrders={allOrders}/>
+
+            <h2>חיפוש במאגר מידע</h2>
 
             <div className="reports-display">
 
@@ -424,7 +394,6 @@ const Reports = () => {
 
                                 <h1>מוצרים</h1>
 
-                                
                                 <div className="right-sticking">
                                     <h2>סנן לפי:</h2>
                                 </div>
@@ -489,13 +458,7 @@ const Reports = () => {
                                     <input className="submit-button" type="submit" value="הצג מוצרים לפי סינון" onClick={handleDisplayFilteredProducts}/>
                                 </div>
 
-                                <input
-                                    style={{ width: '230px' }}
-                                    className="display-button"
-                                    type="submit"
-                                    value="הצג את המוצרים הכי פופולריים"
-                                    onClick={handleShowMostPopular}
-                                />
+
 
                             </div>
                         ): null
@@ -546,21 +509,6 @@ const Reports = () => {
             </div>
 
             <div className="reports-reports">
-
-                {/** Show Most Popular Products */}
-
-                {showPopularProducts && (
-                    <div className="most-popular-display">
-                        <h2>Most Popular Products</h2>
-                        <ul>
-                            {mostPopular.map(([productName, quantity], index) => (
-                                <li key={index}>
-                                    {productName}: {quantity}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
                 
                 {/** Show Orders */}
 
