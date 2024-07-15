@@ -1,8 +1,75 @@
-/* Add this to your CSS file or inside a <style> tag in your HTML file */
 .custom-modal .modal-dialog {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   
+}
+
+.order-ditails{
+  text-align: right;
+}
+
+.order-ditails button{
+  background-color: #115e00;
+  border: #115e00;
+}
+
+.order-ditails button:hover{
+  background-color: #1b8d02;
+}
+
+
+
+.modal-title-12{
+  text-align: center;
+}
+.modal-body-12{
+  margin: auto;
+  border-color: black;
+}
+.modal-body-12 :hover{
+  border-color: #115e00;
+}
+.modal-body-12 input {
+  border: 2px solid black; /* Default border color */
+  padding: 8px;
+  border-radius: 4px;
+  transition: border-color 0.3s ease; /* Optional: smooth transition */
+  direction: rtl;
+}
+
+.modal-body-12 input:focus {
+  border-color: #115e00; /* Replace with your desired color */
+  outline: none; /* Optional: removes the default outline */
+}
+.modal-footer-12{
+  margin-left: 15%;
+}
+
+.modal-button-cancel-12 {
+  background-color: #b10000;
+  border: 2px solid #b10000;
+  color: white; /* Ensure text is readable */
+  margin-right: 10px;
+  width: 40%;
+  height: 150%;
+  border-radius: 10%;
+}
+
+.modal-button-cancel-12:hover {
+  background-color: #ee0303;
+  border-color: #ee0303;
+}
+.modal-button-save-12{
+  background-color: #115e00;
+  border: 2px solid #115e00;
+  color: white;
+  width: 40%;
+  height: 150%;
+  border-radius: 10%;
+}
+.modal-button-save-12:hover {
+  background-color: #1b8d02;
+  border-color: #1b8d02;
+}

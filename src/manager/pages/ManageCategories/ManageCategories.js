@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { db } from '../../../utils/firebase';
 import { collection, doc, addDoc, updateDoc, deleteDoc, query, where, getDocs, writeBatch } from 'firebase/firestore';
+import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
 import '../ManageCategories/ManageCategories.css';
-import NavbarManger from '../../components/navbar/navbar';
 
 const ManageCategories = () => {
     const [categories, setCategories] = useState([]);
@@ -11,6 +11,8 @@ const ManageCategories = () => {
     const [selectedSubcategory, setSelectedSubcategory] = useState('');
     const [newCategory, setNewCategory] = useState('');
     const [newSubcategory, setNewSubcategory] = useState('');
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [confirmAction, setConfirmAction] = useState(null);
 
     const fetchCategories = useCallback(async () => {
         try {
@@ -106,11 +108,22 @@ const ManageCategories = () => {
         }
     };
 
+    const confirmAndRemoveCategory = () => {
+        setConfirmAction(() => handleRemoveCategory);
+        setShowConfirmModal(true);
+    };
+
+    const confirmAndRemoveSubcategory = () => {
+        setConfirmAction(() => handleRemoveSubcategory);
+        setShowConfirmModal(true);
+    };
+
     const handleRemoveCategory = async () => {
         if (!selectedCategory) {
             alert('בחר קטגוריה למחיקה.');
             return;
         }
+
         try {
             const productsCollectionRef = collection(db, 'products');
             const q = query(productsCollectionRef, where('category', '==', selectedCategory));
@@ -137,6 +150,8 @@ const ManageCategories = () => {
         } catch (error) {
             console.error('Error removing category and its products:', error);
         }
+
+        setShowConfirmModal(false);
     };
 
     const handleRemoveSubcategory = async () => {
@@ -144,6 +159,7 @@ const ManageCategories = () => {
             alert('בחר קטגוריה ותת-קטגוריה למחיקה.');
             return;
         }
+
         try {
             const productsCollectionRef = collection(db, 'products');
             const q = query(productsCollectionRef, where('category', '==', selectedCategory), where('subcategory', '==', selectedSubcategory));
@@ -174,63 +190,72 @@ const ManageCategories = () => {
         } catch (error) {
             console.error('Error removing subcategory and its products:', error);
         }
+
+        setShowConfirmModal(false);
     };
 
     return (
-            <div className="category-management">
-                <h3>ניהול קטגוריות ותתי קטגוריות</h3>
-                <input
-                    type="text"
-                    placeholder="קטגוריה חדשה"
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
-                />
-                <button onClick={handleAddCategory}>הוספת קטגוריה</button>
+        <div className="category-management">
+            <h3>ניהול קטגוריות ותתי קטגוריות</h3>
+            <input
+                type="text"
+                placeholder="קטגוריה חדשה"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+            />
+            <button onClick={handleAddCategory}>הוספת קטגוריה</button>
+            <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+                <option value="">בחר קטגוריה להסרה</option>
+                {categories.map((category) => (
+                    <option key={category.id} value={category.name}>
+                        {category.name}
+                    </option>
+                ))}
+            </select>
+            <button className="remove-button" onClick={confirmAndRemoveCategory}>הסרת קטגוריה</button>
 
-                <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-                    <option value="">בחר קטגוריה להסרה</option>
-                    {categories.map((category) => (
-                        <option key={category.id} value={category.name}>
-                            {category.name}
-                        </option>
-                    ))}
-                </select>
-                <button onClick={handleRemoveCategory}>הסרת קטגוריה</button>
+            <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+                <option value="">בחר קטגוריה כדי להוסיף לה תת קטגוריה</option>
+                {categories.map((category) => (
+                    <option key={category.id} value={category.name}>
+                        {category.name}
+                    </option>
+                ))}
+            </select>
+            <input
+                type="text"
+                placeholder="תת קטגוריה חדשה"
+                value={newSubcategory}
+                onChange={(e) => setNewSubcategory(e.target.value)}
+            />
+            <button onClick={handleAddSubcategory}>הוספת תת קטגוריה</button>
 
-                <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-                    <option value="">בחר קטגוריה כדי להוסיף לה תת קטגוריה</option>
-                    {categories.map((category) => (
-                        <option key={category.id} value={category.name}>
-                            {category.name}
-                        </option>
-                    ))}
-                </select>
-                <input
-                    type="text"
-                    placeholder="תת קטגוריה חדשה"
-                    value={newSubcategory}
-                    onChange={(e) => setNewSubcategory(e.target.value)}
-                />
-                <button onClick={handleAddSubcategory}>הוספת תת קטגוריה</button>
+            <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+                <option value="">בחר קטגוריה כדי להסיר ממנה תת קטגוריה</option>
+                {categories.map((category) => (
+                    <option key={category.id} value={category.name}>
+                        {category.name}
+                    </option>
+                ))}
+            </select>
+            <select value={selectedSubcategory} onChange={(e) => setSelectedSubcategory(e.target.value)}>
+                <option value="">בחר תת קטגוריה להסרה</option>
+                {subCategories.map((subCat, index) => (
+                    <option key={index} value={subCat}>
+                        {subCat}
+                    </option>
+                ))}
+            </select>
+            <button className="remove-button" onClick={confirmAndRemoveSubcategory}>הסרת תת קטגוריה</button>
 
-                <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-                    <option value="">בחר קטגוריה כדי להסיר ממנה תת קטגוריה</option>
-                    {categories.map((category) => (
-                        <option key={category.id} value={category.name}>
-                            {category.name}
-                        </option>
-                    ))}
-                </select>
-                <select value={selectedSubcategory} onChange={(e) => setSelectedSubcategory(e.target.value)}>
-                    <option value="">בחר תת קטגוריה להסרה</option>
-                    {subCategories.map((subCat, index) => (
-                        <option key={index} value={subCat}>
-                            {subCat}
-                        </option>
-                    ))}
-                </select>
-                <button onClick={handleRemoveSubcategory}>הסרת תת קטגוריה</button>
-            </div>
+            <ConfirmModal 
+                show={showConfirmModal} 
+                handleClose={() => setShowConfirmModal(false)} 
+                handleConfirm={confirmAction}
+                title="אישור הסרה"
+                body="האם אתה בטוח שברצונך לבצע פעולה זו?"
+            />
+        </div>
     );
 };
 

@@ -28,12 +28,17 @@
 .modal-content h2 {
   margin-bottom: 10px;
   color: green;
+  font-size: 20px;
+  font-family: Arial, sans-serif;
 }
 
 .modal-content label {
   display: flex;
   flex-direction: column;
   color: black;
+  direction: rtl;
+  font-family: Arial, sans-serif;
+
 }
 
 .modal-content input {
@@ -54,6 +59,8 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-family: Arial, sans-serif;
+
 }
 
 .modal-actions .submit {
@@ -63,4 +70,6 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-family: Arial, sans-serif;
+
 }

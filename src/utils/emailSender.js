@@ -16,7 +16,7 @@ export const notifiySuccessfullOrder = (userInfo, selectedProducts, endDate, sta
       from_name: "מחסן חיובי",
       to_name: userInfo.name,
       to_email: userInfo.email,
-      message: 'ההזמנה שלכם התקבלה בהצלחה\n המוצרים שלכם: \n' + selectedProductsText.join('\n') + '\n' + 'תאריך התחלת הזמנה: ' + start_date + '\n' + 'תאריך החזרת המוצרים: ' + end_date + '\n' 
+      message: 'ההזמנה שלכם התקבלה בהצלחה\n המוצרים שלכם: \n' + selectedProductsText.join('\n') + '\n' + 'תאריך התחלת הזמנה: ' + end_date+ '\n' + 'תאריך החזרת המוצרים: ' + start_date  + '\n' 
     }
 
     emailjs.send(SERVICE_ID, TEMPLATE_ID_1, message, PUBLIC_KEY)
@@ -28,10 +28,7 @@ export const notifiySuccessfullOrder = (userInfo, selectedProducts, endDate, sta
 }
 
 export const notifiyLateOrder = (userInfo, selectedProducts) => {
-    
-
     const selectedProductsText = selectedProducts.map(product => "- " + product.productName + " x " + product.selectedQuantity + "\n");
-
     const message = {
       from_name: "מחסן חיובי",
       to_name: userInfo.name,
@@ -47,4 +44,3 @@ export const notifiyLateOrder = (userInfo, selectedProducts) => {
       console.log('Error:', error.text);
     });
 }
-

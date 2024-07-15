@@ -4,12 +4,29 @@ import { db, storage } from "./firebase";
 import { ref, getDownloadURL } from "firebase/storage";
 import { Timestamp } from 'firebase/firestore';
 
-export const fetchProducts = async (pageSize = 5, startAfterDoc = null, category = '', subCategory = '') => {
+export const fetchProducts = async (pageSize = 10, startAfterDoc = null, category = '', subCategory = '', sortBy = '') => {
   let productsQuery = query(
     collection(db, "products"),
-    orderBy('quantity', "desc"),
     limit(pageSize)
   );
+
+  switch (sortBy) {
+    case 'quantity':
+      productsQuery = query(productsQuery, orderBy('quantity', 'desc'));
+      break;
+    case 'category':
+      productsQuery = query(productsQuery, orderBy('category'));
+      break;
+    case 'subcategory':
+      productsQuery = query(productsQuery, orderBy('subcategory'));
+      break;
+    case 'name':
+      productsQuery = query(productsQuery, orderBy('name'));
+      break;
+    default:
+      productsQuery = query(productsQuery, orderBy('quantity', 'desc'));
+      break;
+  }
  
   if (category) {
     productsQuery = query(productsQuery, where("category", "==", category));
@@ -39,20 +56,49 @@ export const fetchProducts = async (pageSize = 5, startAfterDoc = null, category
   }
 };
 
+export const fetchCollection = async (collectionName) => {
+  const categoriesCollection = collection(db, collectionName);
+  const categorySnapshot = await getDocs(categoriesCollection);
+  const orderList = categorySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }))
 
-export const selectfetchProducts = async (category = '', subCategory = '') => {
-  if(!category){
-return [];
+  return orderList;
+};
+
+export const selectfetchProducts = async (category = '', subCategory = '', sortBy = '') => {
+  if (!category) {
+    return [];
   } 
   try {
     let q = query(collection(db, "products"));
-    
+
+    switch (sortBy) {
+      case 'quantity':
+        q = query(q, orderBy('quantity', 'desc'));
+        break;
+      case 'category':
+        q = query(q, orderBy('category'));
+        break;
+      case 'subcategory':
+        q = query(q, orderBy('subcategory'));
+        break;
+      case 'name':
+        q = query(q, orderBy('name'));
+        break;
+      default:
+        q = query(q, orderBy('quantity', 'desc'));
+        break;
+    }
+
     if (category) {
-      q = query(collection(db, "products"), where("category", "==", category));
+      q = query(q, where("category", "==", category));
       if (subCategory) {
         q = query(q, where("subcategory", "==", subCategory));
       }
     }
+    
     const querySnapshot = await getDocs(q);
     console.log('Query Snapshot:', querySnapshot);
     
@@ -196,16 +242,4 @@ export const placeOrder = async (order) => {
   } catch (e) {
     console.error("Error adding document: ", e);
   }
-};
-
-
-export const fetchCollection = async (collectionName) => {
-  const categoriesCollection = collection(db, collectionName);
-  const categorySnapshot = await getDocs(categoriesCollection);
-  const orderList = categorySnapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  }))
-
-  return orderList;
 };

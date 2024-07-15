@@ -1,22 +1,22 @@
 /* ProductItem.css */
 
-.product-item {
-    background-color: #f0f0f0; /* Example background color */
+.product-container2{
+    background-color: #e6e8e6 !important;
     padding: 10px;
     margin-bottom: 10px;
     border-radius: 5px;
 }
 
-.product-item img {
-    width: 100%; /* Ensures images fill their container */
-    height: 200px; /* Set a fixed height or adjust as needed */
-    object-fit: cover; /* Ensures images maintain aspect ratio and cover the container */
+.product-image2{ 
+    width: 100%; 
+    height: 200px;
+    object-fit: cover; 
     border-radius: 5px;
     margin-bottom: 5px;
     cursor: pointer;
 }
 
-.product-item .no-image {
+.no-image2 {
     width: 100px;
     height: 100px;
     display: flex;
@@ -26,22 +26,27 @@
     margin-bottom: 10px;
 }
 
-.product-item .product-detail {
+.product-details2 {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 5px;
+}
+
+.product-category2, .product-subcategory2 {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 5px;
-    position: relative;
 }
 
-.product-item .product-detail span {
+.product-category2 span, .product-subcategory2 span {
     flex: 1;
     text-align: left;
     margin-right: 5px;
     cursor: pointer;
 }
 
-.product-item .product-detail input {
+.product-category2 input, .product-subcategory2 input {
     flex: 1.5; /* Adjusted flex size to make fields smaller */
     padding: 8px;
     border: 1px solid #ddd;
@@ -49,17 +54,18 @@
     margin-right: 5px;
 }
 
-.product-item .product-detail button {
-    flex: 1.5; /* Adjusted flex size to match input fields */
+.edit-buttons2 {
+    background-color: #e6e8e6;
+    text-align: right;
     padding: 8px;
     border: none;
     border-radius: 5px;
-    color: #fff;
+    color: #115e00;
     font-size: 14px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
-.product-item .product-detail button:hover {
-    background-color: #45a049;
-}
+/* .edit-buttons:hover {
+    background-color: #006c00 !important;
+} */

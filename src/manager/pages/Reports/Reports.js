@@ -320,7 +320,7 @@ const Reports = () => {
 
     return (
         <div className="reports-container">
-            <h1>דוחות</h1>
+            <h1 className="reports-main-title">הפקת דוחות</h1>
 
             <div className="reports-display">
 
@@ -340,10 +340,10 @@ const Reports = () => {
                         DisplayOrders? (
                             <div className="old-orders-input">   
 
-                            <h1>הזמנות</h1>                
+                            <h1 className="orders-title">הזמנות</h1>                
 
                             <div className="right-sticking">
-                                <h2>סנן לפי:</h2>
+                                <h2 className="sort-title">סנן לפי:</h2>
                             </div>
                             
 
@@ -551,7 +551,7 @@ const Reports = () => {
 
                 {showPopularProducts && (
                     <div className="most-popular-display">
-                        <h2>Most Popular Products</h2>
+                        <h2>מוצרים פופולריים</h2>
                         <ul>
                             {mostPopular.map(([productName, quantity], index) => (
                                 <li key={index}>
@@ -646,7 +646,7 @@ const Reports = () => {
                 )}
 
                 {showNoReports && (
-                    <h2 style={{ color: 'black' }}>אין דוחות להציג</h2>
+                    <h2 style={{ color: 'black' }}>אין דוחות להצגה</h2>
                 )}
             </div>
         </div>

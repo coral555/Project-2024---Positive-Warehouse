@@ -4,6 +4,9 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { removeFromCart, updateCartItemCount, addToCart } from '../../actions/cartActions';
 import { useCombined } from '../../context/CombinedContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faMinus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import "./cart-item.css";
 
 export const CartItem = ({ data }) => {
   const { id, name, quantity, imageURL } = data;
@@ -58,27 +61,42 @@ export const CartItem = ({ data }) => {
   };
 
   return (
-    <div className="cartItem">
-      <img src={imageURL} alt={name} />
-      <div className="description">
-        <p>
-          <b>{name}</b>
-        </p>
-        <p>Quantity: {quantity}</p>
-        <div className="countHandler">
-          <button onClick={decreaseQuantityHandler}> - </button>
-          <input
-            type="number"
-            min="1"
-            value={quantity}
-            onChange={updateCartItemCountHandler}
-          />
-          <button onClick={increaseQuantityHandler}> + </button>
-        </div>
-        <button className="removeFromCartButton" onClick={removeFromCartHandler}>
-          Remove
-        </button>
+    <section className="cartItem">
+      <div className="deleteIcon">
+        <FontAwesomeIcon icon={faTrash} onClick={removeFromCartHandler} />
       </div>
-    </div>
+      <div className="imageColumn">
+        <img src={imageURL} alt={name} />
+      </div>
+      <div className="detailsWrapper">
+        <div className="nameColumn">
+          <div className="itemName">
+            <p>{name}</p>
+          </div>
+        </div>
+        <div className="quantityColumn">
+          <div className="quantityWrapper">
+            <p>כמות: {quantity}</p>
+            </div>
+          </div>
+          <div className="countColumn">
+            <div className="countHandler">
+              <button onClick={decreaseQuantityHandler} className="circleButton">
+                <FontAwesomeIcon icon={faMinus} />
+              </button>
+              <input
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={updateCartItemCountHandler}
+              />
+              <button onClick={increaseQuantityHandler} className="circleButton">
+                <FontAwesomeIcon icon={faPlus} />
+              </button>
+          </div>
+          
+        </div>
+      </div>
+    </section>
   );
 };

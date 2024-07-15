@@ -8,6 +8,23 @@
   padding: 20px;
 }
 
+.manage-orders h2{
+  color: #115e00;
+  font-size: 30px;
+}
+
+.orders-list h3{
+  text-align: right;
+}
+
+.align-right {
+  text-align: right;
+  display: block;
+}
+.align-right-product{
+  text-align: right;
+}
+
 .search-form {
   margin-bottom: 30px;
   padding: 15px 20px; 
@@ -21,6 +38,7 @@
 }
 
 .search-form input[type="text"] {
+  text-align: right;
   flex: 1; 
   padding: 10px; 
   border: 1px solid #ccc; 
@@ -30,18 +48,13 @@
 }
 
 .search-form button {
-  padding: 10px 15px;
-  border: none; 
-  background-color: #4CAF50;
-  color: white;
-  border-radius: 3px;
-  font-size: 16px; 
-  cursor: pointer;
-  transition: background-color 0.3s ease; 
+  font-size: 20px;
+  justify-content: space-between; /* Distributes space between buttons */
+  gap: 10px; /* Space between buttons */
 }
 
 .search-form button:hover {
-  background-color: #45a049; /* Darker green on hover */
+  background-color: #c7efc9; /* Darker green on hover */
 }
 
 .orders-list {
@@ -98,4 +111,49 @@
 
 .order button:hover {
   background-color: #f0f0f0; 
+}
+
+
+
+/* try */
+.custom-button {
+  background-color: #115e00;
+  color: white;
+  border-radius: 5px;
+  padding: 10px 20px;
+  border: none;
+}
+
+.custom-button:hover {
+  background-color: #1a8802 !important;
+  color: white;
+}
+
+
+.custom-button-delete {
+  background-color: #b10000;
+  color: white;
+  border-radius: 5px;
+  padding: 10px 20px;
+  border: none;
+}
+
+.custom-button-delete:hover {
+  background-color: #ee0303 !important;
+  color: white;
+}
+
+.custom-button-search {
+  background-color: #115e00;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  padding: 5px 10px;
+  border: none;
+  margin-left: 2%;
+}
+
+.custom-button-search:hover {
+  background-color: #1a8802 !important;
+ color: white;
 }

@@ -3,6 +3,7 @@ import { db, storage } from '../../../utils/firebase';
 import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import '../AddNewProduct/AddNewProduct.css';
+import { Button } from 'react-bootstrap';
 
 const AddNewProduct = () => {
     const [categories, setCategories] = useState([]);
@@ -144,7 +145,8 @@ const AddNewProduct = () => {
                 type="file"
                 onChange={handleImageChange}
             />
-            <button onClick={handleAddProduct}>הוספת מוצר</button>
+            {/* <button onClick={handleAddProduct}>הוספת מוצר</button> */}
+            <Button variant="link" onClick={handleAddProduct}>הוספת מוצר</Button>
         </div>
     );
 };

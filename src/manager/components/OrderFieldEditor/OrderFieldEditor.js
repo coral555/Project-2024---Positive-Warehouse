@@ -23,12 +23,14 @@ const OrderFieldEditor = ({ orderId, fieldName, currentValue, handleEditField })
   };
 
   return (
-    <>
+    <div className='order-ditails'>
       <p>
-        <strong>{fieldName}:</strong> {currentValue}
-        <Button variant="link" onClick={openModal}>
-          ✏️
-        </Button>
+        {currentValue}
+       {  console.log("saeed         :" + handleEditField)}
+        <strong> :{fieldName == "orderDate"? "תאריך הזמנה " :  (fieldName == "startDate" ? "תאריך קבלה " : (fieldName == "endDate" ? "תאריך החזרה " : (
+          fieldName == "email" ? "מייל " : (fieldName == "name" ? "שם " : "מספר נייד "))))}</strong> 
+          
+        <Button variant="link" onClick={openModal}>✏</Button>
       </p>
 
       <Modal
@@ -37,8 +39,10 @@ const OrderFieldEditor = ({ orderId, fieldName, currentValue, handleEditField })
         centered
         className="custom-modal"
       >
-          <Modal.Title>Edit {fieldName}</Modal.Title>
-        <Modal.Body>
+        <Modal.Title className='modal-title-12'>עריכת {fieldName == "orderDate"? "תאריך הזמנה" :  (fieldName == "startDate" ? "תאריך קבלה" : (fieldName == "endDate" ? "תאריך החזרה" : (
+          fieldName == "email" ? "מייל" : (fieldName == "name" ? "שם" : "מספר נייד"))))}
+        </Modal.Title>
+        <Modal.Body className='modal-body-12'>
           <input
             type="text"
             value={newValue}
@@ -46,16 +50,16 @@ const OrderFieldEditor = ({ orderId, fieldName, currentValue, handleEditField })
             className="form-control"
           />
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Cancel
+        <Modal.Footer className='modal-footer-12'>
+          <Button className='modal-button-cancel-12' variant="secondary" onClick={handleClose}>
+            ביטול
           </Button>
-          <Button variant="primary" onClick={handleSave}>
-            Save Changes
+          <Button className='modal-button-save-12' variant="primary" onClick={handleSave}>
+            שמירה
           </Button>
         </Modal.Footer>
       </Modal>
-    </>
+    </div>
   );
 };
 

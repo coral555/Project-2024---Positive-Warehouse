@@ -1,52 +1,148 @@
-.product-detail {
-    display: flex;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 30px;
-    border: 1px solid #a6a6a6;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-  }
+.product-container {
+  display: flex;
+  background-color: #eeefef;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  align-items: flex-start;
+  max-width: 1200px; /* Set a max-width */
+  margin: auto; /* Center container */
+}
+
+.product-image {
+  flex: 1;
+  max-width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.product-info {
+  flex: 1;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Pushes buttons to the bottom */
+  overflow-y: auto; /* Allow scrolling if content overflows */
+}
+
+.product-content {
+  flex-grow: 1; /* Allows this section to grow and push buttons down */
+  display: flex;
+  flex-direction: column; /* Ensures content is stacked vertically */
+}
+
+.product-img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+}
+
+.product-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 12px;
+}
+
+.product-description {
+  color: #666666;
+  margin-bottom: 16px;
+  word-wrap: break-word;
+}
+.alert {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: red;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 1000;
   
-  .product-detail h1 {
-    font-size: 2em;
-    margin-bottom: 20px;
-  }
+}
+.alert.show {
+  opacity: 1;
+}
+.alert.success {
+    background-color: green;
+}
+.product-details {
   
-  .product-detail img {
-    width: 50%;
-    max-width: 400px;
-    height: auto;
-    margin-left: 20px;
-  }
+  margin-bottom: 16px;
+}
+
+.product-quantity {
+  color: #666666;
+}
+
+.product-quantity-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 165px; /* Adjusted space between content and buttons */
+  justify-content: center;
+  align-items: center;
+}
+
+.quantity-controls {
   
-  .product-detail .details {
-    flex: 1;
-    text-align: left; /* Align text to the left within the details section */
-  }
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+}
+
+.quantity-button {
+  background-color: #115e00;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  font-size: 16px;
+  display: flex;
+  padding: 12px 24px;
   
-  .product-detail p {
-    font-size: 1.2em;
-    color: #555;
-  }
-  
-  .product-detail p.price {
-    font-size: 1.5em;
-    color: #000;
-    font-weight: bold;
-  }
-  
-  .product-detail button {
-    background-color: #1d1d1e;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    margin-top: 20px;
-    cursor: pointer;
-  }
-  
-  .product-detail button:hover {
-    background-color: rgb(19, 19, 19);
-    color: white;
-    cursor: pointer;  }
-  
+
+}
+
+.quantity-button:hover {
+  background-color: #115e00;
+}
+
+.quantity-button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+.quantity-controls input {
+  width:100%;
+  text-align: center;
+  border: 1px solid #ccc;
+  padding: 12px 50px;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
+.product-buttons-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px; /* Adjusted space between content and buttons */
+}
+
+.product-button {
+  flex: 1; /* If you want buttons to take equal space */
+  background-color:#115e00;
+  color: #ffffff;
+  border: none;
+  padding: 12px 24px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.product-button:hover {
+  background-color: #115e00;
+}
